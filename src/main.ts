@@ -3,6 +3,7 @@ import {
   currentMonitor,
   availableMonitors,
   PhysicalPosition,
+  LogicalPosition,
   type Monitor,
 } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/core";
@@ -494,35 +495,103 @@ async function syncBridgeAtStartup() {
   }
 }
 
+// Monitors disagree about physical pixels when their scale factors differ
+// (a 2x built-in next to a 1x external), so adjacency and the crossing
+// animation both work in the logical point space macOS arranges displays in.
+function logicalRect(m: Monitor) {
+  const s = m.scaleFactor;
+  return {
+    x: m.position.x / s,
+    y: m.position.y / s,
+    w: m.size.width / s,
+    h: m.size.height / s,
+  };
+}
+
 async function adjacentMonitor(dir: -1 | 1): Promise<Monitor | undefined> {
   try {
     const monitors = await availableMonitors();
-    const boundary = dir === 1 ? monX + monW : monX;
+    const cur = {
+      x: monX / scale,
+      y: monY / scale,
+      w: monW / scale,
+      h: monH / scale,
+    };
+    const boundary = dir === 1 ? cur.x + cur.w : cur.x;
     return monitors.find((m) => {
-      if (m.position.x === monX && m.position.y === monY) return false; // self
-      const overlapsY =
-        m.position.y < monY + monH && m.position.y + m.size.height > monY;
+      const r = logicalRect(m);
+      if (Math.abs(r.x - cur.x) < 1 && Math.abs(r.y - cur.y) < 1) return false; // self
+      const overlapsY = r.y < cur.y + cur.h && r.y + r.h > cur.y;
       if (!overlapsY) return false;
       return dir === 1
-        ? Math.abs(m.position.x - boundary) <= 8
-        : Math.abs(m.position.x + m.size.width - boundary) <= 8;
+        ? Math.abs(r.x - boundary) <= 16
+        : Math.abs(r.x + r.w - boundary) <= 16;
     });
   } catch {
     return undefined;
   }
 }
 
+let crossFrame: ReturnType<typeof setInterval> | null = null;
+
+function stopCross() {
+  if (crossFrame) clearInterval(crossFrame);
+  crossFrame = null;
+}
+
+// Cross into the adjacent monitor without teleporting. Floors rarely line
+// up across displays: onto a lower floor she walks over the boundary and
+// parachutes down; onto a higher one she rides the jet up and over.
 async function crossTo(m: Monitor, dir: -1 | 1) {
-  scale = m.scaleFactor;
-  monX = m.position.x;
-  monY = m.position.y;
-  monW = m.size.width;
-  monH = m.size.height;
-  standingOn = floorPlatform();
-  const x = dir === 1 ? monX + 8 : monX + monW - winW - 8;
-  await appWindow.setPosition(new PhysicalPosition(x, monY + monH - winH));
-  setState("idle");
-  scheduleNext();
+  const pos = await appWindow.outerPosition();
+  const lw = winW / scale;
+  const lh = winH / scale;
+  let x = pos.x / scale;
+  let y = pos.y / scale;
+  const r = logicalRect(m);
+  const endX = dir === 1 ? r.x + 8 : r.x + r.w - lw - 8;
+  const floorTop = r.y + r.h - lh; // window y when standing on the new floor
+  const climbing = floorTop < y - 8;
+  const cruiseY = floorTop - 110; // enough headroom to parachute onto the floor
+  const speed = Math.max(1.5, 2 * personality); // logical pt per tick
+
+  const arrive = async () => {
+    stopCross();
+    await refreshMonitor(); // the window sits on the new monitor now
+    await refreshPlatforms(); // platform px depend on the monitor's scale
+    standingOn = null;
+    if (climbing) void fall(Math.round(y * scale));
+    else void settle(); // level floor rests in place, lower floor parachutes
+  };
+
+  setFlip(dir);
+  setState(climbing ? "jet" : "walk");
+
+  const dt = 0.016;
+  let vx = 0;
+  let t = 0;
+  crossFrame = setInterval(async () => {
+    if (state !== (climbing ? "jet" : "walk")) return stopCross();
+    let arrived = false;
+    if (climbing) {
+      t += dt;
+      // Climb first so she never dips below the taller monitor's visible
+      // area, then cruise sideways over the boundary.
+      y += (cruiseY - y) * 0.06 + Math.sin(t * 5.5) * 0.5;
+      if (y - cruiseY < 40) {
+        vx = Math.min(vx + 2600 * dt, 1300); // logical pt/s
+        x += dir * vx * dt;
+      }
+    } else {
+      x += speed * dir;
+    }
+    if ((dir === 1 && x >= endX) || (dir === -1 && x <= endX)) {
+      x = endX;
+      arrived = true;
+    }
+    await appWindow.setPosition(new LogicalPosition(x, y));
+    if (arrived) await arrive();
+  }, 16);
 }
 
 function stopWalk() {

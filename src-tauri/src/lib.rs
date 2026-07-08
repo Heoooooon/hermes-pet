@@ -96,10 +96,83 @@ mod macos {
     }
 }
 
+// ---------- Lanbeam pet bridge (localhost) ----------
+//
+// The Lanbeam macOS Agent publishes a loopback-only HTTP listener whose port
+// is written to ~/Library/Application Support/Lanbeam/pet-bridge.json.
+// Through it the pet can hand itself off to the paired iPad and learn when
+// it has been sent back.
+
+fn bridge_port() -> Option<u16> {
+    let home = std::env::var("HOME").ok()?;
+    let path = format!("{home}/Library/Application Support/Lanbeam/pet-bridge.json");
+    let data = std::fs::read_to_string(path).ok()?;
+    let value: serde_json::Value = serde_json::from_str(&data).ok()?;
+    u16::try_from(value.get("port")?.as_u64()?).ok()
+}
+
+fn bridge_request(method: &str, path: &str, body: Option<&str>) -> Result<String, String> {
+    use std::io::{Read, Write};
+    use std::time::Duration;
+
+    let port = bridge_port().ok_or("pet bridge unavailable")?;
+    let mut stream = std::net::TcpStream::connect_timeout(
+        &std::net::SocketAddr::from(([127, 0, 0, 1], port)),
+        Duration::from_secs(2),
+    )
+    .map_err(|e| e.to_string())?;
+    stream.set_read_timeout(Some(Duration::from_secs(3))).ok();
+    stream.set_write_timeout(Some(Duration::from_secs(3))).ok();
+
+    let body = body.unwrap_or("");
+    let request = format!(
+        "{method} {path} HTTP/1.1\r\nHost: 127.0.0.1\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+        body.len()
+    );
+    stream.write_all(request.as_bytes()).map_err(|e| e.to_string())?;
+
+    let mut response = String::new();
+    stream.read_to_string(&mut response).map_err(|e| e.to_string())?;
+    if !response.starts_with("HTTP/1.1 200") {
+        return Err(format!(
+            "bridge status: {}",
+            response.lines().next().unwrap_or("<empty>")
+        ));
+    }
+    response
+        .split_once("\r\n\r\n")
+        .map(|(_, b)| b.to_string())
+        .ok_or_else(|| "malformed bridge response".into())
+}
+
+#[tauri::command]
+async fn pet_bridge_state() -> Result<String, String> {
+    tauri::async_runtime::spawn_blocking(|| bridge_request("GET", "/local/pet/state", None))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
+async fn pet_bridge_handoff(to: String, entry_edge: String) -> Result<String, String> {
+    if !matches!(to.as_str(), "mac" | "ios") || !matches!(entry_edge.as_str(), "left" | "right") {
+        return Err("invalid handoff arguments".into());
+    }
+    tauri::async_runtime::spawn_blocking(move || {
+        let body = format!(r#"{{"to":"{to}","entryEdge":"{entry_edge}"}}"#);
+        bridge_request("POST", "/local/pet/handoff", Some(&body))
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![list_windows])
+        .invoke_handler(tauri::generate_handler![
+            list_windows,
+            pet_bridge_state,
+            pet_bridge_handoff
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

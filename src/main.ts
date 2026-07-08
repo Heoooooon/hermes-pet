@@ -248,13 +248,99 @@ async function walk() {
 }
 
 // Reaching the end of a platform: on the floor, cross into an adjacent
-// monitor when one exists; otherwise climb up and sit on the corner.
+// monitor when one exists, then try handing off to the iPad via Lanbeam;
+// otherwise climb up and sit on the corner.
 async function arriveAtEnd(dir: -1 | 1) {
   if (standingOn?.id === "floor") {
     const next = await adjacentMonitor(dir);
     if (next) return crossTo(next, dir);
+    if (await tryCrossToIPad(dir)) return;
   }
   enterEdge(dir);
+}
+
+// ---------- Lanbeam handoff: the pet can move to the paired iPad ----------
+
+type PetBridgeState = {
+  location: "mac" | "ios";
+  entryEdge?: "left" | "right" | null;
+  sequence: number;
+  updatedAt: string;
+};
+
+let bridgeSequence = -1; // last handoff sequence this side has processed
+let awayPoll: ReturnType<typeof setInterval> | null = null;
+
+// Walking off the Mac's right edge enters the iPad from its left, and
+// vice versa — the iPad behaves like an adjacent display.
+async function tryCrossToIPad(dir: -1 | 1): Promise<boolean> {
+  try {
+    const raw = await invoke<string>("pet_bridge_handoff", {
+      to: "ios",
+      entryEdge: dir === 1 ? "left" : "right",
+    });
+    bridgeSequence = (JSON.parse(raw) as PetBridgeState).sequence;
+  } catch {
+    return false; // agent not running or no bridge — stay on the Mac
+  }
+  await goAway();
+  return true;
+}
+
+// Hide while the pet lives on the iPad; poll the bridge for its return.
+async function goAway() {
+  if (walkTimer) clearTimeout(walkTimer);
+  if (edgeTimer) clearTimeout(edgeTimer);
+  setState("idle");
+  await appWindow.hide();
+  let failures = 0;
+  awayPoll = setInterval(async () => {
+    try {
+      const raw = await invoke<string>("pet_bridge_state");
+      const st = JSON.parse(raw) as PetBridgeState;
+      failures = 0;
+      if (st.location === "mac" && st.sequence > bridgeSequence) {
+        bridgeSequence = st.sequence;
+        stopAwayPoll();
+        await comeBack(st.entryEdge === "right" ? "right" : "left");
+      }
+    } catch {
+      // Agent quit while the pet was away — after ~15s give up and return.
+      failures += 1;
+      if (failures >= 15) {
+        stopAwayPoll();
+        await comeBack("right");
+      }
+    }
+  }, 1000);
+}
+
+function stopAwayPoll() {
+  if (awayPoll) clearInterval(awayPoll);
+  awayPoll = null;
+}
+
+async function comeBack(edge: "left" | "right") {
+  await refreshMonitor();
+  standingOn = floorPlatform();
+  const x = edge === "left" ? monX + 8 : monX + monW - winW - 8;
+  await appWindow.setPosition(new PhysicalPosition(x, monY + monH - winH));
+  setFlip(edge === "left" ? 1 : -1); // face into the screen
+  await appWindow.show();
+  setState("idle");
+  scheduleNext();
+}
+
+// If the app starts while the pet is already on the iPad, stay hidden.
+async function syncBridgeAtStartup() {
+  try {
+    const raw = await invoke<string>("pet_bridge_state");
+    const st = JSON.parse(raw) as PetBridgeState;
+    bridgeSequence = st.sequence;
+    if (st.location === "ios") await goAway();
+  } catch {
+    // no agent — purely local pet
+  }
 }
 
 async function adjacentMonitor(dir: -1 | 1): Promise<Monitor | undefined> {
@@ -459,6 +545,7 @@ async function init() {
   await appWindow.setPosition(new PhysicalPosition(x, monY + monH - winH));
   setInterval(refreshPlatforms, 500);
   scheduleNext();
+  void syncBridgeAtStartup();
 }
 
 init();

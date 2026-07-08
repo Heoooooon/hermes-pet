@@ -40,7 +40,7 @@ let jetFrame: ReturnType<typeof setInterval> | null = null;
 // Per-state animation assets. A state without a (loaded) asset falls back
 // to the idle sprite; CSS keyframes still apply on top either way.
 const SPRITES: Record<State, string> = {
-  idle: "/character.apng",
+  idle: "/idle.apng",
   walk: "/walk.apng",
   drag: "/drag.apng",
   react: "/react.apng",

@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "kind": "sprite-gen-request",
+  "engine": "component-row",
+  "character": {
+    "id": "chibi-idle",
+    "description": "chibi girl, black bob hair, orange-accent headphones with H logo, white jacket, black shorts and sneakers, shoulder bag",
+    "base_image": "base-source.png"
+  },
+  "cell": {
+    "shape": "rect",
+    "width": 192,
+    "height": 256,
+    "safe_margin_x": 18,
+    "safe_margin_y": 16
+  },
+  "chroma_key": {
+    "name": "cyan",
+    "hex": "#00FFFF",
+    "rgb": [
+      0,
+      255,
+      255
+    ],
+    "selection": "auto",
+    "score": 222.29,
+    "min_subject_distance": 203.74
+  },
+  "states": {
+    "idle": {
+      "frames": 4,
+      "fps": 4,
+      "loop": true,
+      "action": "standing idle facing the viewer, relaxed, arms resting at her sides, gentle breathing with a soft smile, blinking once mid-cycle; the frames form a smooth breathing loop that flows back into frame 1; only the chest rise, hair sway and eyes change between frames, pose and feet stay fixed"
+    }
+  },
+  "style": "match the attached base/anchor reference image EXACTLY: same pixel density (logical pixel block size), same body proportions, same outline weight, same palette, same shading style, same level of detail. Do not restyle, do not change proportions, do not add or remove detail density. Avoid polished illustration, painterly rendering, anime key art, 3D render, vector app-icon polish, glossy lighting, soft gradients, and anti-aliased high-detail edges.",
+  "motion_phase_guides": false,
+  "fit": {
+    "align_x": "foot-centroid",
+    "align_y": "bottom"
+  }
+}

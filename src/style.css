@@ -26,7 +26,7 @@ body {
 
 #pet {
   --flip: 1;
-  width: 200px;
+  width: 176px;
   pointer-events: none;
   transform-origin: bottom center;
   transform: scaleX(var(--flip));
@@ -47,10 +47,14 @@ body[data-state="walk"] #pet {
   animation: step 0.42s ease-in-out infinite;
 }
 
+/* The drawn idle loop breathes on its own; CSS breathe would double it. */
+body[data-state="idle"].has-idle #pet {
+  animation: none;
+}
+
 /* With a real drawn walk cycle, the CSS bob would fight the frames. */
 body[data-state="walk"].has-walk #pet {
   animation: none;
-  width: 176px;
 }
 
 /* The fall/parachute sequence is fully drawn — no CSS motion on top. */

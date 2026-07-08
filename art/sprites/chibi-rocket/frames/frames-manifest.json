@@ -1,0 +1,90 @@
+{
+  "ok": true,
+  "engine": "component-row",
+  "run_dir": "/Users/cmore/workspace/aipet/art/sprites/chibi-rocket",
+  "cell": {
+    "shape": "rect",
+    "width": 192,
+    "height": 256,
+    "safe_margin_x": 18,
+    "safe_margin_y": 16
+  },
+  "chroma_key": {
+    "name": "cyan",
+    "hex": "#00FFFF",
+    "rgb": [
+      0,
+      255,
+      255
+    ],
+    "selection": "auto",
+    "score": 222.29,
+    "min_subject_distance": 203.74
+  },
+  "rows": [
+    {
+      "state": "rocket",
+      "frames": 4,
+      "method": "components",
+      "files": [
+        "frames/rocket/frame-0.png",
+        "frames/rocket/frame-1.png",
+        "frames/rocket/frame-2.png",
+        "frames/rocket/frame-3.png"
+      ],
+      "frame_records": [
+        {
+          "index": 0,
+          "nontransparent_pixels": 14200,
+          "bbox": [
+            35,
+            19,
+            143,
+            236
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 7
+        },
+        {
+          "index": 1,
+          "nontransparent_pixels": 14068,
+          "bbox": [
+            32,
+            19,
+            151,
+            236
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 3
+        },
+        {
+          "index": 2,
+          "nontransparent_pixels": 14659,
+          "bbox": [
+            34,
+            19,
+            155,
+            236
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 5
+        },
+        {
+          "index": 3,
+          "nontransparent_pixels": 13599,
+          "bbox": [
+            35,
+            21,
+            146,
+            234
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 6
+        }
+      ],
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "warnings": []
+}

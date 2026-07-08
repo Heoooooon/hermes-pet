@@ -15,12 +15,13 @@ const effects = document.getElementById("effects")!;
 const menu = document.getElementById("menu")!;
 const quitBtn = document.getElementById("quit")!;
 
-type State = "idle" | "walk" | "drag" | "react" | "fall" | "edge";
+type State = "idle" | "walk" | "drag" | "react" | "fall" | "edge" | "rocket";
 let state: State = "idle";
 let walkTimer: ReturnType<typeof setTimeout> | null = null;
 let walkFrame: ReturnType<typeof setInterval> | null = null;
 let fallFrame: ReturnType<typeof setInterval> | null = null;
 let edgeTimer: ReturnType<typeof setTimeout> | null = null;
+let rocketFrame: ReturnType<typeof setInterval> | null = null;
 
 // Per-state animation assets. A state without a (loaded) asset falls back
 // to the idle sprite; CSS keyframes still apply on top either way.
@@ -31,6 +32,7 @@ const SPRITES: Record<State, string> = {
   react: "/react.apng",
   fall: "/fall.apng",
   edge: "/edge.apng",
+  rocket: "/rocket.apng",
 };
 
 // One-shot APNGs (plays=1) need a cache-buster to replay on re-entry.
@@ -198,12 +200,87 @@ function stopFall() {
 function scheduleNext() {
   if (walkTimer) clearTimeout(walkTimer);
   walkTimer = setTimeout(() => {
-    if (state === "idle" && Math.random() < 0.8) {
+    if (state !== "idle") return scheduleNext();
+    const roll = Math.random();
+    if (roll < 0.15 && loadedSprites.has("rocket")) {
+      void rocketLaunch();
+    } else if (roll < 0.8) {
       walk();
     } else {
       scheduleNext();
     }
   }, 2000 + Math.random() * 3000);
+}
+
+// ---------- rocket: blast off, cut the engine, parachute down ----------
+
+async function rocketLaunch() {
+  if (state !== "idle") return scheduleNext();
+  const pos = await appWindow.outerPosition();
+  const feet = pos.y + winH;
+
+  // Aim for a window platform well above us when one exists; otherwise
+  // fly to the top of the screen. Either way the landing is the existing
+  // parachute drop, which re-targets whatever is below on the way down.
+  const high = windowPlatforms.filter(
+    (p) => p.y < feet - winH * 1.2 && p.x2 - p.x1 >= winW,
+  );
+  const target =
+    high.length && Math.random() < 0.7
+      ? high[Math.floor(Math.random() * high.length)]
+      : null;
+  const startX = pos.x;
+  const targetX = target
+    ? Math.round(
+        Math.min(
+          Math.max(platformCenterX(target) - winW / 2, target.x1),
+          target.x2 - winW,
+        ),
+      )
+    : startX;
+  const apexY = target
+    ? target.y - winH - Math.round(60 * scale) // overshoot, then drop onto it
+    : monY + Math.round(16 * scale);
+
+  setState("rocket");
+  document.body.classList.add("ignite");
+  await new Promise((resolve) => setTimeout(resolve, 650));
+  document.body.classList.remove("ignite");
+  if ((state as State) !== "rocket") return; // grabbed during ignition
+
+  const dt = 0.016;
+  let y = pos.y;
+  let vy = 0;
+  let t = 0;
+  const climb = Math.max(1, pos.y - apexY);
+
+  rocketFrame = setInterval(async () => {
+    if (state !== "rocket") return stopRocket();
+    t += dt;
+    vy = Math.min(vy + 3400 * dt, 2400); // physical px/s
+    y -= vy * dt;
+    const progress = Math.min(1, (pos.y - y) / climb);
+    const x = Math.round(
+      startX + (targetX - startX) * progress + Math.sin(t * 16) * 2.5 * scale,
+    );
+    if (y <= apexY) {
+      stopRocket();
+      await appWindow.setPosition(new PhysicalPosition(x, apexY));
+      void fall(apexY); // engine cut → parachute
+      return;
+    }
+    await appWindow.setPosition(new PhysicalPosition(x, Math.round(y)));
+  }, 16);
+}
+
+function platformCenterX(p: Platform): number {
+  return p.x1 + (p.x2 - p.x1) / 2;
+}
+
+function stopRocket() {
+  if (rocketFrame) clearInterval(rocketFrame);
+  rocketFrame = null;
+  document.body.classList.remove("ignite");
 }
 
 // ---------- walking ----------
@@ -450,6 +527,7 @@ stage.addEventListener("mousedown", (e) => {
   if (menu.contains(e.target as Node)) return;
   menu.hidden = true;
   if (state === "fall") stopFall(); // caught mid-air
+  if (state === "rocket") stopRocket(); // plucked off the rocket
   pressed = true;
   dragging = false;
   downX = e.screenX;

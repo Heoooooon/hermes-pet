@@ -63,6 +63,25 @@ body[data-state="edge"].has-edge #pet {
   animation: none;
 }
 
+/* Rocket flames are drawn frames; the ignite class adds launch-pad shake. */
+body[data-state="rocket"].has-rocket #pet {
+  animation: none;
+}
+
+body.ignite #pet {
+  animation: shake 0.09s linear infinite !important;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: scaleX(var(--flip)) translateX(-1.5px);
+  }
+  50% {
+    transform: scaleX(var(--flip)) translateX(1.5px) translateY(-1px);
+  }
+}
+
 @keyframes step {
   0%,
   100% {

@@ -9,19 +9,33 @@ import { invoke } from "@tauri-apps/api/core";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 
 const appWindow = getCurrentWindow();
+
+// The original pet ("main") owns the iPad handoff; spawned friends are
+// local-only and get a slightly different size and stride for personality.
+const isMainPet = appWindow.label === "main";
+const personality = isMainPet ? 1 : 0.72 + Math.random() * 0.36;
 const stage = document.getElementById("stage")!;
 const pet = document.getElementById("pet") as HTMLImageElement;
 const effects = document.getElementById("effects")!;
 const menu = document.getElementById("menu")!;
 const quitBtn = document.getElementById("quit")!;
 
-type State = "idle" | "walk" | "drag" | "react" | "fall" | "edge" | "rocket";
+type State =
+  | "idle"
+  | "walk"
+  | "drag"
+  | "react"
+  | "fall"
+  | "edge"
+  | "rocket"
+  | "jet";
 let state: State = "idle";
 let walkTimer: ReturnType<typeof setTimeout> | null = null;
 let walkFrame: ReturnType<typeof setInterval> | null = null;
 let fallFrame: ReturnType<typeof setInterval> | null = null;
 let edgeTimer: ReturnType<typeof setTimeout> | null = null;
 let rocketFrame: ReturnType<typeof setInterval> | null = null;
+let jetFrame: ReturnType<typeof setInterval> | null = null;
 
 // Per-state animation assets. A state without a (loaded) asset falls back
 // to the idle sprite; CSS keyframes still apply on top either way.
@@ -33,6 +47,7 @@ const SPRITES: Record<State, string> = {
   fall: "/fall.apng",
   edge: "/edge.apng",
   rocket: "/rocket.apng",
+  jet: "/jet.apng",
 };
 
 // One-shot APNGs (plays=1) need a cache-buster to replay on re-entry.
@@ -202,14 +217,71 @@ function scheduleNext() {
   walkTimer = setTimeout(() => {
     if (state !== "idle") return scheduleNext();
     const roll = Math.random();
-    if (roll < 0.15 && loadedSprites.has("rocket")) {
+    if (roll < 0.12 && loadedSprites.has("rocket")) {
       void rocketLaunch();
+    } else if (roll < 0.24 && loadedSprites.has("jet")) {
+      void jetDash();
     } else if (roll < 0.8) {
       walk();
     } else {
       scheduleNext();
     }
   }, 2000 + Math.random() * 3000);
+}
+
+// ---------- jet: hop on a rocket and blast sideways across the screen ----------
+
+async function jetDash() {
+  if (state !== "idle") return scheduleNext();
+  const pos = await appWindow.outerPosition();
+  const minX = monX;
+  const maxX = monX + monW - winW;
+
+  // Only bother for a proper dash — short hops are what walking is for.
+  let targetX = Math.round(minX + Math.random() * (maxX - minX));
+  if (Math.abs(targetX - pos.x) < monW * 0.35) {
+    targetX = pos.x < (minX + maxX) / 2 ? maxX : minX;
+  }
+  const dir: -1 | 1 = targetX > pos.x ? 1 : -1;
+  const cruiseY = Math.max(
+    monY + Math.round(40 * scale),
+    pos.y - Math.round((60 + Math.random() * 160) * scale),
+  );
+
+  setFlip(dir);
+  setState("jet");
+
+  const dt = 0.016;
+  let x = pos.x;
+  let y = pos.y;
+  let vx = 0;
+  let t = 0;
+
+  jetFrame = setInterval(async () => {
+    if (state !== "jet") return stopJet();
+    t += dt;
+    vx = Math.min(vx + 4200 * dt, 2400); // physical px/s
+    x += dir * vx * dt;
+    const bobY = cruiseY + Math.sin(t * 5.5) * 7 * scale;
+    y += (bobY - y) * 0.09; // ease up to cruise altitude, then bob
+    const arrived = (dir === 1 && x >= targetX) || (dir === -1 && x <= targetX);
+    if (arrived) {
+      stopJet();
+      await appWindow.setPosition(
+        new PhysicalPosition(targetX, Math.round(y)),
+      );
+      void fall(Math.round(y)); // dismount → parachute
+      return;
+    }
+    await appWindow.setPosition(
+      new PhysicalPosition(Math.round(x), Math.round(y)),
+    );
+  }, 16);
+}
+
+function stopJet() {
+  if (jetFrame) clearInterval(jetFrame);
+  jetFrame = null;
 }
 
 // ---------- rocket: blast off, cut the engine, parachute down ----------
@@ -299,7 +371,7 @@ async function walk() {
   let targetX = Math.round(minX + Math.random() * (maxX - minX));
   if (Math.random() < 0.35) targetX = Math.random() < 0.5 ? minX : maxX;
   const dir: -1 | 1 = targetX > pos.x ? 1 : -1;
-  const speed = Math.max(2, Math.round(2 * scale));
+  const speed = Math.max(2, Math.round(2 * scale * personality));
   const edgeZone = Math.round(16 * scale);
 
   setFlip(dir);
@@ -351,6 +423,7 @@ let awayPoll: ReturnType<typeof setInterval> | null = null;
 // Walking off the Mac's right edge enters the iPad from its left, and
 // vice versa — the iPad behaves like an adjacent display.
 async function tryCrossToIPad(dir: -1 | 1): Promise<boolean> {
+  if (!isMainPet) return false; // 친구들은 Mac에 남는다
   try {
     const raw = await invoke<string>("pet_bridge_handoff", {
       to: "ios",
@@ -410,6 +483,7 @@ async function comeBack(edge: "left" | "right") {
 
 // If the app starts while the pet is already on the iPad, stay hidden.
 async function syncBridgeAtStartup() {
+  if (!isMainPet) return;
   try {
     const raw = await invoke<string>("pet_bridge_state");
     const st = JSON.parse(raw) as PetBridgeState;
@@ -528,6 +602,7 @@ stage.addEventListener("mousedown", (e) => {
   menu.hidden = true;
   if (state === "fall") stopFall(); // caught mid-air
   if (state === "rocket") stopRocket(); // plucked off the rocket
+  if (state === "jet") stopJet();
   pressed = true;
   dragging = false;
   downX = e.screenX;
@@ -598,6 +673,30 @@ stage.addEventListener("contextmenu", (e) => {
 
 quitBtn.addEventListener("click", () => appWindow.close());
 
+// ---------- spawn friends ----------
+
+const friendBtn = document.getElementById("friend")!;
+let friendsSpawned = 0;
+
+friendBtn.addEventListener("click", () => {
+  menu.hidden = true;
+  if (friendsSpawned >= 3) return; // enough chaos per window
+  friendsSpawned += 1;
+  const label = `pet-${Date.now().toString(36)}-${friendsSpawned}`;
+  new WebviewWindow(label, {
+    url: "index.html",
+    width: 220,
+    height: 240,
+    transparent: true,
+    decorations: false,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    shadow: false,
+    resizable: false,
+    acceptFirstMouse: true,
+  });
+});
+
 // ---------- debug overlay toggle ----------
 
 const debugBtn = document.getElementById("debug-toggle")!;
@@ -619,7 +718,12 @@ async function init() {
   await refreshMonitor();
   await refreshPlatforms();
   standingOn = floorPlatform();
-  const x = Math.round(monX + (monW - winW) / 2);
+  // Friends are a bit smaller and land somewhere random along the floor.
+  (pet.style as CSSStyleDeclaration & { zoom: string }).zoom =
+    String(personality);
+  const x = isMainPet
+    ? Math.round(monX + (monW - winW) / 2)
+    : Math.round(monX + (0.1 + Math.random() * 0.8) * (monW - winW));
   await appWindow.setPosition(new PhysicalPosition(x, monY + monH - winH));
   setInterval(refreshPlatforms, 500);
   scheduleNext();

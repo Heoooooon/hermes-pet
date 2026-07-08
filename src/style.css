@@ -68,6 +68,12 @@ body[data-state="rocket"].has-rocket #pet {
   animation: none;
 }
 
+/* Sideways jet ride — wide sprite, flame trailing behind. */
+body[data-state="jet"].has-jet #pet {
+  animation: none;
+  width: 216px;
+}
+
 body.ignite #pet {
   animation: shake 0.09s linear infinite !important;
 }

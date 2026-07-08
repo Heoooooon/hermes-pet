@@ -771,15 +771,51 @@ friendBtn.addEventListener("click", () => {
 const debugBtn = document.getElementById("debug-toggle")!;
 let debugShown = false;
 
-debugBtn.addEventListener("click", async () => {
-  const overlay = await WebviewWindow.getByLabel("debug");
-  if (!overlay) return;
-  debugShown = !debugShown;
-  if (debugShown) await overlay.show();
-  else await overlay.hide();
+// One overlay per monitor, spawned lazily on first toggle. Each gets its
+// monitor's logical rect in the query string and draws in local coords.
+async function setDebugShown(shown: boolean) {
+  debugShown = shown;
+  try {
+    const monitors = await availableMonitors();
+    for (let i = 0; i < monitors.length; i++) {
+      const m = monitors[i];
+      const label = `debug-${i}`;
+      const overlay = await WebviewWindow.getByLabel(label);
+      if (overlay) {
+        if (debugShown) await overlay.show();
+        else await overlay.hide();
+      } else if (debugShown) {
+        const r = logicalRect(m);
+        new WebviewWindow(label, {
+          url: `debug.html?ox=${r.x}&oy=${r.y}&lh=${r.h}`,
+          x: r.x,
+          y: r.y,
+          width: r.w,
+          height: r.h,
+          transparent: true,
+          decorations: false,
+          alwaysOnTop: true,
+          skipTaskbar: true,
+          shadow: false,
+          resizable: false,
+          focus: false,
+        });
+      }
+    }
+  } catch {
+    // monitor enumeration failed — leave whatever overlays exist as-is
+  }
   debugBtn.textContent = debugShown ? "표시 끄기" : "인식 표시";
+}
+
+debugBtn.addEventListener("click", async () => {
+  await setDebugShown(!debugShown);
   menu.hidden = true;
 });
+
+// Overlays are separate windows and survive a dev reload — start hidden
+// so the toggle state and what's on screen never disagree.
+if (isMainPet) void setDebugShown(false);
 
 // ---------- startup: sit at the bottom center of the screen ----------
 

@@ -1,11 +1,8 @@
 // Debug overlay: a click-through fullscreen window that draws which desktop
 // windows the pet recognizes and which top edges qualify as platforms.
-import {
-  getCurrentWindow,
-  currentMonitor,
-  PhysicalPosition,
-  PhysicalSize,
-} from "@tauri-apps/api/window";
+// One overlay covers one monitor; main.ts spawns one per monitor and passes
+// that monitor's logical rect in the query string.
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/core";
 
 const win = getCurrentWindow();
@@ -16,16 +13,18 @@ const ctx = canvas.getContext("2d")!;
 const PET_W = 220;
 const PET_H = 240;
 
+// Logical rect of the monitor this overlay covers. list_windows reports
+// global logical coordinates, so drawing subtracts this origin.
+let originX = 0;
+let originY = 0;
 let monLogicalH = 0;
 
 async function init() {
-  const monitor = await currentMonitor();
-  if (!monitor) return;
-  monLogicalH = monitor.size.height / monitor.scaleFactor;
-  await win.setPosition(
-    new PhysicalPosition(monitor.position.x, monitor.position.y),
-  );
-  await win.setSize(new PhysicalSize(monitor.size.width, monitor.size.height));
+  // Created by main.ts directly at its monitor's position/size.
+  const params = new URLSearchParams(location.search);
+  originX = Number(params.get("ox"));
+  originY = Number(params.get("oy"));
+  monLogicalH = Number(params.get("lh"));
   await win.setIgnoreCursorEvents(true); // never intercept the mouse
 
   const dpr = window.devicePixelRatio || 1;
@@ -49,8 +48,16 @@ async function draw() {
   ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
   for (const w of wins) {
-    const walkable =
-      w.width >= PET_W && w.y - PET_H > 0 && w.y < monLogicalH - 6;
+    // Local coordinates on this overlay's monitor; windows on other
+    // monitors land outside the canvas and clip away naturally.
+    const x = w.x - originX;
+    const y = w.y - originY;
+    if (x + w.width < 0 || x > window.innerWidth) continue;
+    if (y + w.height < 0 || y > window.innerHeight) continue;
+
+    // Walkable is judged against this monitor, mirroring refreshPlatforms:
+    // wide enough, headroom below the menu bar, meaningfully above the floor.
+    const walkable = w.width >= PET_W && y - PET_H > 0 && y < monLogicalH - 6;
 
     // Full window outline.
     ctx.strokeStyle = walkable
@@ -58,7 +65,7 @@ async function draw() {
       : "rgba(255, 120, 120, 0.45)";
     ctx.lineWidth = 1.5;
     ctx.setLineDash([6, 5]);
-    ctx.strokeRect(w.x, w.y, w.width, w.height);
+    ctx.strokeRect(x, y, w.width, w.height);
     ctx.setLineDash([]);
 
     // The top edge — the actual platform the pet walks on.
@@ -67,8 +74,8 @@ async function draw() {
       : "rgba(255, 110, 110, 0.7)";
     ctx.lineWidth = walkable ? 4 : 2;
     ctx.beginPath();
-    ctx.moveTo(w.x, w.y);
-    ctx.lineTo(w.x + w.width, w.y);
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + w.width, y);
     ctx.stroke();
 
     // Label.
@@ -81,9 +88,9 @@ async function draw() {
     ctx.fillStyle = walkable
       ? "rgba(20, 90, 45, 0.85)"
       : "rgba(110, 40, 40, 0.8)";
-    ctx.fillRect(w.x + 6, w.y + 4, tw + pad * 2, 18);
+    ctx.fillRect(x + 6, y + 4, tw + pad * 2, 18);
     ctx.fillStyle = "#fff";
-    ctx.fillText(label, w.x + 6 + pad, w.y + 17);
+    ctx.fillText(label, x + 6 + pad, y + 17);
   }
 
   // Floor line + legend.

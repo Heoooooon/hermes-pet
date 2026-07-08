@@ -2,7 +2,7 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capabilities for the pet window",
-  "windows": ["main", "debug", "pet-*"],
+  "windows": ["main", "debug-*", "pet-*"],
   "permissions": [
     "core:default",
     "core:webview:allow-create-webview-window",

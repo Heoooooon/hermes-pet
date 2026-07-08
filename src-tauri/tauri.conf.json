@@ -26,21 +26,6 @@
         "maximizable": false,
         "minimizable": false,
         "acceptFirstMouse": true
-      },
-      {
-        "label": "debug",
-        "url": "debug.html",
-        "title": "aipet-debug",
-        "width": 400,
-        "height": 300,
-        "visible": false,
-        "transparent": true,
-        "decorations": false,
-        "alwaysOnTop": true,
-        "skipTaskbar": true,
-        "shadow": false,
-        "resizable": false,
-        "focus": false
       }
     ],
     "security": {

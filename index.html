@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>aipet</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body data-state="idle">
+    <div id="stage">
+      <img id="pet" src="/character.apng" alt="pet" draggable="false" />
+      <div id="effects"></div>
+      <div id="menu" hidden>
+        <button id="debug-toggle">인식 표시</button>
+        <button id="quit">종료</button>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

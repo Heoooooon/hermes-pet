@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "kind": "sprite-gen-curation",
+  "states": {
+    "walk": {
+      "selected": [
+        0,
+        2,
+        1,
+        5,
+        4,
+        3
+      ],
+      "order": [
+        0,
+        2,
+        1,
+        5,
+        4,
+        3
+      ],
+      "transforms": {
+        "1": {
+          "rotate": 0,
+          "scale": 1,
+          "dx": 3.0345394736842106,
+          "dy": 3.34046052631579,
+          "shx": 0,
+          "shy": 0,
+          "flipX": 0
+        }
+      }
+    }
+  }
+}

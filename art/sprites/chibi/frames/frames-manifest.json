@@ -1,0 +1,116 @@
+{
+  "ok": true,
+  "engine": "component-row",
+  "run_dir": "/Users/cmore/workspace/aipet/art/sprites/chibi",
+  "cell": {
+    "shape": "rect",
+    "width": 192,
+    "height": 208,
+    "safe_margin_x": 18,
+    "safe_margin_y": 16
+  },
+  "chroma_key": {
+    "name": "cyan",
+    "hex": "#00FFFF",
+    "rgb": [
+      0,
+      255,
+      255
+    ],
+    "selection": "auto",
+    "score": 222.29,
+    "min_subject_distance": 203.74
+  },
+  "rows": [
+    {
+      "state": "walk",
+      "frames": 6,
+      "method": "components",
+      "files": [
+        "frames/walk/frame-0.png",
+        "frames/walk/frame-1.png",
+        "frames/walk/frame-2.png",
+        "frames/walk/frame-3.png",
+        "frames/walk/frame-4.png",
+        "frames/walk/frame-5.png"
+      ],
+      "frame_records": [
+        {
+          "index": 0,
+          "nontransparent_pixels": 9147,
+          "bbox": [
+            47,
+            16,
+            148,
+            192
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 1
+        },
+        {
+          "index": 1,
+          "nontransparent_pixels": 8578,
+          "bbox": [
+            52,
+            16,
+            137,
+            192
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 1
+        },
+        {
+          "index": 2,
+          "nontransparent_pixels": 8588,
+          "bbox": [
+            55,
+            16,
+            143,
+            192
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 1
+        },
+        {
+          "index": 3,
+          "nontransparent_pixels": 8740,
+          "bbox": [
+            48,
+            16,
+            148,
+            192
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 1
+        },
+        {
+          "index": 4,
+          "nontransparent_pixels": 8738,
+          "bbox": [
+            52,
+            16,
+            138,
+            192
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 2
+        },
+        {
+          "index": 5,
+          "nontransparent_pixels": 8662,
+          "bbox": [
+            55,
+            16,
+            144,
+            192
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 2
+        }
+      ],
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "warnings": []
+}

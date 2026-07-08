@@ -1,0 +1,27 @@
+[package]
+name = "aipet"
+version = "0.1.0"
+description = "An open-source desktop pet"
+edition = "2021"
+license = "MIT"
+
+[lib]
+name = "aipet_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["macos-private-api"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+core-foundation = "0.10"
+core-graphics = "0.24"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1

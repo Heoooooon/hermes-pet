@@ -802,6 +802,52 @@ async function hopOff(dir: -1 | 1) {
   void settle();
 }
 
+// ---------- stranded-window watchdog ----------
+//
+// Rearranging displays can leave the window outside every screen (macOS
+// keeps the stale coordinates). If the pet is nowhere visible, drop her
+// back onto the primary monitor's floor.
+async function recoverIfStranded() {
+  if (state === "drag" || awayPoll) return; // hidden-on-iPad has its own flow
+  try {
+    const monitors = await availableMonitors();
+    if (!monitors.length) return;
+    const pos = await appWindow.outerPosition();
+    const cx = (pos.x + winW / 2) / scale;
+    const cy = (pos.y + winH / 2) / scale;
+    const visible = monitors.some((m) => {
+      const r = logicalRect(m);
+      return (
+        cx >= r.x - 100 &&
+        cx <= r.x + r.w + 100 &&
+        cy >= r.y - 400 && // rockets legitimately overshoot the top
+        cy <= r.y + r.h + 100
+      );
+    });
+    if (visible) return;
+    const primary =
+      monitors.find((m) => m.position.x === 0 && m.position.y === 0) ??
+      monitors[0];
+    const r = logicalRect(primary);
+    stopWalk();
+    stopFall();
+    stopRocket();
+    stopJet();
+    stopCross();
+    await appWindow.setPosition(
+      new LogicalPosition(r.x + r.w / 2, r.y + r.h - winH / scale),
+    );
+    await appWindow.show();
+    await refreshMonitor();
+    standingOn = floorPlatform();
+    setState("idle");
+    scheduleNext();
+  } catch {
+    // monitor enumeration hiccup — try again next tick
+  }
+}
+setInterval(() => void recoverIfStranded(), 5000);
+
 // ---------- support check: react when windows move or close ----------
 
 setInterval(async () => {
@@ -1070,6 +1116,9 @@ async function init() {
     ? Math.round(monX + (monW - winW) / 2)
     : Math.round(monX + (0.1 + Math.random() * 0.8) * (monW - winW));
   await appWindow.setPosition(new PhysicalPosition(x, monY + monH - winH));
+  // A dev reload (or crash) while hidden for the iPad handoff would leave
+  // the fresh session invisible — the window state outlives the page.
+  await appWindow.show();
   setInterval(refreshPlatforms, 500);
   scheduleNext();
   void syncBridgeAtStartup();

@@ -18,7 +18,11 @@ fn list_windows() -> Vec<DesktopWindow> {
     {
         macos::list_windows()
     }
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(target_os = "windows")]
+    {
+        win::list_windows()
+    }
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
     {
         Vec::new()
     }
@@ -93,6 +97,110 @@ mod macos {
             });
         }
         out
+    }
+}
+
+// NOTE: compiles but has not yet been exercised on a real Windows machine.
+#[cfg(target_os = "windows")]
+mod win {
+    use super::DesktopWindow;
+    use windows::Win32::Foundation::{BOOL, HWND, LPARAM, RECT, TRUE};
+    use windows::Win32::Graphics::Dwm::{
+        DwmGetWindowAttribute, DWMWA_CLOAKED, DWMWA_EXTENDED_FRAME_BOUNDS,
+    };
+    use windows::Win32::UI::HiDpi::GetDpiForWindow;
+    use windows::Win32::UI::WindowsAndMessaging::{
+        EnumWindows, GetClassNameW, GetWindowLongW, GetWindowTextLengthW,
+        GetWindowThreadProcessId, IsIconic, IsWindowVisible, GWL_EXSTYLE, WS_EX_TOOLWINDOW,
+    };
+
+    // Shell surfaces that are technically visible top-level windows but must
+    // never become platforms (wallpaper host, taskbars).
+    const SHELL_CLASSES: [&str; 4] = [
+        "Progman",
+        "WorkerW",
+        "Shell_TrayWnd",
+        "Shell_SecondaryTrayWnd",
+    ];
+
+    pub fn list_windows() -> Vec<DesktopWindow> {
+        let mut out: Vec<DesktopWindow> = Vec::new();
+        unsafe {
+            let _ = EnumWindows(Some(enum_proc), LPARAM(&mut out as *mut _ as isize));
+        }
+        out
+    }
+
+    unsafe extern "system" fn enum_proc(hwnd: HWND, lparam: LPARAM) -> BOOL {
+        let out = &mut *(lparam.0 as *mut Vec<DesktopWindow>);
+
+        if !IsWindowVisible(hwnd).as_bool() || IsIconic(hwnd).as_bool() {
+            return TRUE;
+        }
+        // Untitled top-level windows are almost never real app windows.
+        if GetWindowTextLengthW(hwnd) == 0 {
+            return TRUE;
+        }
+        if GetWindowLongW(hwnd, GWL_EXSTYLE) as u32 & WS_EX_TOOLWINDOW.0 != 0 {
+            return TRUE;
+        }
+        // Cloaked = UWP shells and windows parked on other virtual desktops.
+        let mut cloaked: u32 = 0;
+        if DwmGetWindowAttribute(
+            hwnd,
+            DWMWA_CLOAKED,
+            &mut cloaked as *mut _ as *mut _,
+            std::mem::size_of::<u32>() as u32,
+        )
+        .is_ok()
+            && cloaked != 0
+        {
+            return TRUE;
+        }
+        let mut pid: u32 = 0;
+        GetWindowThreadProcessId(hwnd, Some(&mut pid));
+        if pid == std::process::id() {
+            return TRUE;
+        }
+        let mut class_buf = [0u16; 64];
+        let len = GetClassNameW(hwnd, &mut class_buf) as usize;
+        let class = String::from_utf16_lossy(&class_buf[..len]);
+        if SHELL_CLASSES.contains(&class.as_str()) {
+            return TRUE;
+        }
+
+        // The visible frame, without the invisible resize borders.
+        let mut rect = RECT::default();
+        if DwmGetWindowAttribute(
+            hwnd,
+            DWMWA_EXTENDED_FRAME_BOUNDS,
+            &mut rect as *mut _ as *mut _,
+            std::mem::size_of::<RECT>() as u32,
+        )
+        .is_err()
+        {
+            return TRUE;
+        }
+
+        // Same logical-point contract as the macOS list: physical pixels
+        // divided by the window's own DPI scale.
+        let k = GetDpiForWindow(hwnd) as f64 / 96.0;
+        if k <= 0.0 {
+            return TRUE;
+        }
+        let width = (rect.right - rect.left) as f64 / k;
+        let height = (rect.bottom - rect.top) as f64 / k;
+        if width < 160.0 || height < 90.0 {
+            return TRUE;
+        }
+        out.push(DesktopWindow {
+            id: hwnd.0 as i64,
+            x: rect.left as f64 / k,
+            y: rect.top as f64 / k,
+            width,
+            height,
+        });
+        TRUE
     }
 }
 

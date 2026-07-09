@@ -26,7 +26,7 @@ app windows, rockets between monitors, and can even hop over to your iPad.
 
 ## 시작하기
 
-요구 사항: macOS, [Node.js](https://nodejs.org) 18+, [Rust](https://rustup.rs) 툴체인.
+요구 사항: [Node.js](https://nodejs.org) 18+, [Rust](https://rustup.rs) 툴체인.
 
 ```bash
 npm install
@@ -35,7 +35,17 @@ npm run tauri build   # 배포용 앱 빌드
 ```
 
 - 조작: 드래그로 이동 · 클릭으로 반응 · **우클릭**으로 메뉴(친구+/설정/인식 표시/종료)
-- 창 인식은 `CGWindowListCopyWindowInfo`(퍼블릭 API)만 사용합니다 — 별도 권한 불필요.
+- 창 인식은 퍼블릭 API만 사용합니다 — 별도 권한 불필요.
+  (macOS `CGWindowListCopyWindowInfo` / Windows `EnumWindows` + DWM)
+
+### 플랫폼 지원
+
+| 플랫폼 | 상태 |
+| --- | --- |
+| **macOS** | 개발·검증 완료 (기본 타깃) |
+| **Windows** | 실험적 — 창 발판 인식까지 Win32로 구현·컴파일 확인, 실기기 검증 전. 이슈 환영! |
+
+iPad 핸드오프는 macOS 전용입니다(Lanbeam 에이전트가 macOS 앱).
 
 ## 나만의 캐릭터 넣기
 

@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "kind": "sprite-gen-request",
+  "engine": "component-row",
+  "character": {
+    "id": "simeong-edge2",
+    "description": "golden retriever puppy boy, fluffy cream-blond hair and floppy ears, dark round eyes, navy open jacket over white tee, black cropped pants, white sneakers, brown leather backpack, wristwatch, fluffy cream tail",
+    "base_image": "base-source.png"
+  },
+  "cell": {
+    "shape": "rect",
+    "width": 192,
+    "height": 256,
+    "safe_margin_x": 18,
+    "safe_margin_y": 16
+  },
+  "chroma_key": {
+    "name": "cyan",
+    "hex": "#00FFFF",
+    "rgb": [
+      0,
+      255,
+      255
+    ],
+    "selection": "auto",
+    "score": 212.65,
+    "min_subject_distance": 192.58
+  },
+  "states": {
+    "edge2": {
+      "frames": 4,
+      "fps": 5,
+      "loop": false,
+      "action": "climbing onto a ledge corner and dozing off, side-view facing right: grabs the ledge edge, pulls himself up to sit, then nods off - final frame sitting with eyes closed, head tilted forward, tail curled around, legs dangling; the final frame is a steady sleeping hold; both arms clearly drawn"
+    }
+  },
+  "style": "match the attached base/anchor reference image EXACTLY: same pixel density (logical pixel block size), same body proportions, same outline weight, same palette, same shading style, same level of detail. Do not restyle, do not change proportions, do not add or remove detail density. Avoid polished illustration, painterly rendering, anime key art, 3D render, vector app-icon polish, glossy lighting, soft gradients, and anti-aliased high-detail edges.",
+  "motion_phase_guides": false,
+  "fit": {
+    "align_x": "centroid",
+    "align_y": "bottom"
+  }
+}

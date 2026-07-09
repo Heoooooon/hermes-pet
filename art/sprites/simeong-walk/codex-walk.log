@@ -8,7 +8,7 @@ approval: never
 sandbox: workspace-write [workdir, /tmp, $TMPDIR]
 reasoning effort: xhigh
 reasoning summaries: none
-session id: 019f4572-2901-76e3-a275-7dceb0be7a00
+session id: 019f45b4-3a6c-7760-bcab-3a0f910a742c
 --------
 user
 You are running one step of the sprite-gen pipeline in this directory.
@@ -62,11 +62,13 @@ hook: UserPromptSubmit Completed
 hook: UserPromptSubmit Completed
 hook: UserPromptSubmit Completed
 codex
-I detect execution intent: generate the requested sprite sheet artifact from the provided prompt and references, save only `raw/walk.png`, and report dimensions. I’m using the `imagegen` skill because this turn requires AI raster image generation.
+I detect execution intent: run this sprite-generation step exactly and save only the requested output. I’m using the `imagegen` skill because this task requires generating a raster sprite sheet from the attached references.
 hook: PreToolUse
 hook: PreToolUse
 hook: PreToolUse Completed
 hook: PreToolUse Completed
+hook: PreToolUse
+hook: PreToolUse
 exec
 /bin/zsh -lc "sed -n '1,240p' /Users/cmore/.codex/skills/.system/imagegen/SKILL.md" in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
  succeeded in 0ms:
@@ -312,17 +314,31 @@ Augmentation rules:
 - If any critical detail is missing and blocks success, ask a question; otherwise proceed.
 
 hook: PostToolUse
-hook: PostToolUse Completed
-hook: PreToolUse
 hook: PreToolUse Completed
-  → Read `prompts/walk.txt` and confirm target path state
-  • Generate the walk sprite sheet with the built-in image tool
-  • Save output as `raw/walk.png` without touching other files
-  • Print pixel dimensions for `raw/walk.png`
+hook: PreToolUse Completed
+hook: PostToolUse Completed
+exec
+/bin/zsh -lc 'pwd && rg --files' in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
+ succeeded in 0ms:
+/Users/cmore/workspace/aipet/art/sprites/simeong-walk
+raw/walk.png
+codex-walk.log
+prompts/walk.txt
+frames/frames-manifest.json
+frames/walk/frame-0.png
+frames/walk/frame-1.png
+frames/walk/frame-3.png
+frames/walk/frame-2.png
+frames/walk/frame-5.png
+frames/walk/frame-4.png
+base-source.png
+references/layout-guides/walk.png
+sprite-request.json
+
 hook: PostToolUse
 hook: PostToolUse Completed
 codex
-I’m reading the exact prompt and checking only the target output location before generation. After that I’ll generate once with the two visible references: Image 1 as the character base and Image 2 as the layout guide.
+The prompt and reference files are present, and `raw/walk.png` already exists. Since the user named that exact destination, I’ll replace only that file and leave the rest of the directory untouched.
 hook: PreToolUse
 hook: PreToolUse
 hook: PreToolUse
@@ -336,7 +352,127 @@ hook: PreToolUse Completed
 hook: PreToolUse Completed
 hook: PreToolUse Completed
 exec
-/bin/zsh -lc "sed -n '1,240p' prompts/walk.txt" in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
+/bin/zsh -lc "sed -n '241,520p' /Users/cmore/.codex/skills/.system/imagegen/SKILL.md" in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
+exec
+/bin/zsh -lc "sed -n '1,260p' prompts/walk.txt" in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
+ succeeded in 0ms:
+
+## Examples
+
+### Generation example (hero image)
+```text
+Use case: product-mockup
+Asset type: landing page hero
+Primary request: a minimal hero image of a ceramic coffee mug
+Style/medium: clean product photography
+Composition/framing: wide composition with usable negative space for page copy if needed
+Lighting/mood: soft studio lighting
+Constraints: no logos, no text, no watermark
+```
+
+### Edit example (invariants)
+```text
+Use case: precise-object-edit
+Asset type: product photo background replacement
+Primary request: replace only the background with a warm sunset gradient
+Constraints: change only the background; keep the product and its edges unchanged; no text; no watermark
+```
+
+## Prompting best practices
+- Structure prompt as scene/backdrop -> subject -> details -> constraints.
+- Include intended use (ad, UI mock, infographic) to set the mode and polish level.
+- Use camera/composition language for photorealism.
+- Only use SVG/vector stand-ins when the user explicitly asked for vector output or a non-image placeholder.
+- Quote exact text and specify typography + placement.
+- For tricky words, spell them letter-by-letter and require verbatim rendering.
+- For multi-image inputs, reference images by index and describe how they should be used.
+- For edits, repeat invariants every iteration to reduce drift.
+- Iterate with single-change follow-ups.
+- If the prompt is generic, add only the extra detail that will materially help.
+- If the prompt is already detailed, normalize it instead of expanding it.
+- For CLI fallback only, see `references/cli.md` and `references/image-api.md` for model, `quality`, `input_fidelity`, masks, output format, and output-path guidance.
+- For transparent images, use the built-in-first chroma-key workflow unless the request is complex enough to need true CLI transparency; ask before switching to CLI `gpt-image-1.5`.
+
+More principles shared by both modes: `references/prompting.md`.
+Copy/paste specs shared by both modes: `references/sample-prompts.md`.
+
+## Guidance by asset type
+Asset-type templates (website assets, game assets, wireframes, logo) are consolidated in `references/sample-prompts.md`.
+
+## gpt-image-2 guidance for CLI fallback
+
+The fallback CLI defaults to `gpt-image-2`.
+
+- Use `gpt-image-2` for new CLI/API workflows unless the request needs true model-native transparent output.
+- If a transparent request may need CLI fallback, ask before using `gpt-image-1.5` unless the user already explicitly requested `gpt-image-1.5`, `scripts/image_gen.py`, or CLI fallback. Explain that the built-in chroma-key path is the default, but true transparency requires `gpt-image-1.5` because `gpt-image-2` does not support `background=transparent`.
+- `gpt-image-2` always uses high fidelity for image inputs; do not set `input_fidelity` with this model.
+- `gpt-image-2` supports `quality` values `low`, `medium`, `high`, and `auto`.
+- Use `quality low` for fast drafts, thumbnails, and quick iterations. Use `medium`, `high`, or `auto` for final assets, dense text, diagrams, identity-sensitive edits, or high-resolution outputs.
+- Square images are typically fastest to generate. Use `1024x1024` for fast square drafts.
+- If the user asks for 4K-style output, use `3840x2160` for landscape or `2160x3840` for portrait.
+- `gpt-image-2` size may be `auto` or `WIDTHxHEIGHT` if all constraints hold: max edge `<= 3840px`, both edges multiples of `16px`, long-to-short ratio `<= 3:1`, total pixels between `655,360` and `8,294,400`.
+
+Popular `gpt-image-2` sizes:
+- `1024x1024` square
+- `1536x1024` landscape
+- `1024x1536` portrait
+- `2048x2048` 2K square
+- `2048x1152` 2K landscape
+- `3840x2160` 4K landscape
+- `2160x3840` 4K portrait
+- `auto`
+
+## Fallback CLI mode only
+
+### Temp and output conventions
+These conventions apply only to the CLI fallback. They do not describe built-in `image_gen` output behavior.
+- Use `tmp/imagegen/` for intermediate files (for example JSONL batches); delete them when done.
+- Write final artifacts under `output/imagegen/`.
+- Use `--out` or `--out-dir` to control output paths; keep filenames stable and descriptive.
+
+### Dependencies
+Prefer `uv` for dependency management in this repo.
+
+Required Python package:
+```bash
+uv pip install openai
+```
+
+Required for local chroma-key removal and optional downscaling:
+```bash
+uv pip install pillow
+```
+
+Portability note:
+- If you are using the installed skill outside this repo, install dependencies into that environment with its package manager.
+- In uv-managed environments, `uv pip install ...` remains the preferred path.
+
+### Environment
+- `OPENAI_API_KEY` must be set for live API calls.
+- Do not ask the user for `OPENAI_API_KEY` when using the built-in `image_gen` tool.
+- Never ask the user to paste the full key in chat. Ask them to set it locally and confirm when ready.
+
+If the key is missing, give the user these steps:
+1. Create an API key in the OpenAI platform UI: https://platform.openai.com/api-keys
+2. Set `OPENAI_API_KEY` as an environment variable in their system.
+3. Offer to guide them through setting the environment variable for their OS/shell if needed.
+
+If installation is not possible in this environment, tell the user which dependency is missing and how to install it into their active environment.
+
+### Script-mode notes
+- CLI commands + examples: `references/cli.md`
+- API parameter quick reference: `references/image-api.md`
+- Network approvals / sandbox settings for CLI mode: `references/codex-network.md`
+
+## Reference map
+- `references/prompting.md`: shared prompting principles for both modes.
+- `references/sample-prompts.md`: shared copy/paste prompt recipes for both modes.
+- `references/cli.md`: fallback-only CLI usage via `scripts/image_gen.py`.
+- `references/image-api.md`: fallback-only API/CLI parameter reference.
+- `references/codex-network.md`: fallback-only network/sandbox troubleshooting for CLI mode.
+- `scripts/image_gen.py`: fallback-only CLI implementation. Do not load or use it unless the user explicitly chooses CLI mode or explicitly confirms a transparent request's true CLI transparency fallback.
+- `$CODEX_HOME/skills/.system/imagegen/scripts/remove_chroma_key.py`: local post-processing helper for built-in transparent-image requests.
+
  succeeded in 0ms:
 Create a single horizontal sprite strip for the game character `simeong-walk` in the state `walk`.
 
@@ -347,7 +483,7 @@ Style contract: match the attached base/anchor reference image EXACTLY: same pix
 
 Use this prompt as an authoritative sprite-production spec. Do not expand it into a polished illustration, painterly character image, anime key art, 3D render, vector mascot, glossy app icon, realistic portrait, or marketing artwork.
 
-Animation action: side-view walk cycle facing right: continuous locomotion, alternating legs with clear foot contact, arms swinging naturally, backpack and tail bobbing slightly.
+Animation action: side-view walk cycle facing right: continuous natural locomotion with alternating legs and clear foot contact. BOTH arms are clearly visible and swing naturally opposite to the legs - the near arm swings across the jacket, the far arm peeks past the backpack; hands drawn as clean rounded paws, never hidden in pockets, never fused with the body. Tail and ears bob gently. The body scale is identical in all six frames.
 
 Anchor lock:
 - Accepted idle/direction anchors own character identity, outfit details, colors, face design, asymmetric markings, and side-specific accessories for final action rows.
@@ -391,81 +527,22 @@ Layout requirements:
 Output only the sprite strip image.
 
 hook: PostToolUse
+hook: PostToolUse
 exec
-/bin/zsh -lc "find raw -maxdepth 1 -type f -name 'walk.png' -print 2>/dev/null" in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
+/bin/zsh -lc 'file base-source.png references/layout-guides/walk.png raw/walk.png' in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
  succeeded in 0ms:
-hook: PostToolUse
-hook: PostToolUse Completed
-exec
-/bin/zsh -lc 'ls -ld raw 2>/dev/null' in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
- succeeded in 0ms:
-drwxr-xr-x@ 2 cmore  staff  64 Jul  9 14:52 raw
-
-hook: PostToolUse Completed
-hook: PostToolUse
-hook: PostToolUse Completed
-hook: PreToolUse
-hook: PreToolUse Completed
-  ✓ Read `prompts/walk.txt` and confirm target path state
-  → Generate the walk sprite sheet with the built-in image tool
-  • Save output as `raw/walk.png` without touching other files
-  • Print pixel dimensions for `raw/walk.png`
-hook: PostToolUse
-hook: PostToolUse Completed
-codex
-The prompt is a strict production spec with a cyan chroma-key background and exactly six 192x208 slots. I’m passing that file text unchanged to the image generator now.
-codex
-Generation finished; I’m locating the tool’s saved PNG so I can copy that exact result into `raw/walk.png`. The generated preview has the expected six-frame row structure and cyan background.
-hook: PreToolUse
-hook: PreToolUse Completed
-  ✓ Read `prompts/walk.txt` and confirm target path state
-  ✓ Generate the walk sprite sheet with the built-in image tool
-  → Save output as `raw/walk.png` without touching other files
-  • Print pixel dimensions for `raw/walk.png`
-hook: PostToolUse
-hook: PostToolUse Completed
-hook: PreToolUse
-hook: PreToolUse
-hook: PreToolUse Completed
-hook: PreToolUse Completed
-hook: PreToolUse
-hook: PreToolUse
-exec
-/bin/zsh -lc 'find "$HOME/Library/Application Support/orca/codex-runtime-home/home/generated_images" -type f -name '"'*.png' -mmin -30 -print" in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
- succeeded in 0ms:
-/Users/cmore/Library/Application Support/orca/codex-runtime-home/home/generated_images/019f456f-a3ba-7720-94ca-3275fed89716/ig_023675543a156637016a4f375a413c81919ed78500de4f0498.png
-/Users/cmore/Library/Application Support/orca/codex-runtime-home/home/generated_images/019f4572-2901-76e3-a275-7dceb0be7a00/ig_01077ad8f833efed016a4f3802a474819187fbac312fd23157.png
+base-source.png:                   PNG image data, 450 x 1050, 8-bit/color RGBA, non-interlaced
+references/layout-guides/walk.png: PNG image data, 1152 x 208, 8-bit/color RGB, non-interlaced
+raw/walk.png:                      PNG image data, 1330 x 1182, 8-bit/color RGB, non-interlaced
 
 hook: PostToolUse
-hook: PreToolUse Completed
-hook: PreToolUse Completed
 hook: PostToolUse Completed
-exec
-/bin/zsh -lc 'find "$HOME/.codex" -path '"'*generated_images*' -type f -name '*.png' -mmin -30 -print 2>/dev/null" in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
-hook: PostToolUse
 hook: PostToolUse Completed
- succeeded in 499ms:
-codex
-I found the current tool output under the generated-images folder named in the runtime notice. I’m copying that PNG directly to the requested path without post-processing it.
-hook: PreToolUse
-hook: PreToolUse
-hook: PreToolUse Completed
-hook: PreToolUse Completed
-exec
-/bin/zsh -lc 'mkdir -p raw && cp "$HOME/Library/Application Support/orca/codex-runtime-home/home/generated_images/019f4572-2901-76e3-a275-7dceb0be7a00/ig_01077ad8f833efed016a4f3802a474819187fbac312fd23157.png" raw/walk.png' in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
- succeeded in 0ms:
-hook: PostToolUse
 hook: PostToolUse Completed
 codex
-`raw/walk.png` is now in place. I’m checking the saved image dimensions and opening it once for a quick visual QA pass.
-hook: PreToolUse
-hook: PreToolUse Completed
-  ✓ Read `prompts/walk.txt` and confirm target path state
-  ✓ Generate the walk sprite sheet with the built-in image tool
-  ✓ Save output as `raw/walk.png` without touching other files
-  → Print pixel dimensions for `raw/walk.png`
-hook: PostToolUse
-hook: PostToolUse Completed
+I’ve read the production prompt verbatim. The image-generation call will use that exact prompt text; the base character and row guide are the two visual references already in the conversation.
+codex
+The generation completed and produced a six-frame walk strip on cyan. I’m locating the generated file under the built-in image output directory, then I’ll copy it to `raw/walk.png` and report its dimensions.
 hook: PreToolUse
 hook: PreToolUse
 hook: PreToolUse
@@ -475,45 +552,81 @@ hook: PreToolUse Completed
 hook: PreToolUse Completed
 hook: PreToolUse Completed
 exec
-/bin/zsh -lc 'file raw/walk.png' in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
+/bin/zsh -lc "printf '%s\\n' \""'${CODEX_HOME:-$HOME/.codex}"' in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
  succeeded in 0ms:
-raw/walk.png: PNG image data, 1330 x 1182, 8-bit/color RGB, non-interlaced
+/Users/cmore/Library/Application Support/orca/codex-runtime-home/home
 
 hook: PostToolUse
 hook: PostToolUse Completed
 exec
-/bin/zsh -lc 'sips -g pixelWidth -g pixelHeight raw/walk.png' in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
- succeeded in 0ms:
+/bin/zsh -lc 'find "${CODEX_HOME:-$HOME/.codex}" -path '"'*generated_images*' -type f -mmin -10 -print" in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
+hook: PostToolUse
+hook: PostToolUse Completed
+ succeeded in 197ms:
+/Users/cmore/Library/Application Support/orca/codex-runtime-home/home/generated_images/019f45b4-3a6c-7760-bcab-3a0f910a742c/ig_0380b8e74d328f09016a4f48e728348191aab4b1d13d02f5eb.png
+
+codex
+The generated asset path is resolved. I’m copying that PNG into the requested workspace path and checking the saved file directly.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc 'mkdir -p raw && cp "/Users/cmore/Library/Application Support/orca/codex-runtime-home/home/generated_images/019f45b4-3a6c-7760-bcab-3a0f910a742c/ig_0380b8e74d328f09016a4f48e728348191aab4b1d13d02f5eb.png" raw/walk.png && sips -g pixelWidth -g pixelHeight raw/walk.png' in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
+hook: PostToolUse
+hook: PostToolUse Completed
+ succeeded in 191ms:
 /Users/cmore/workspace/aipet/art/sprites/simeong-walk/raw/walk.png
-  pixelWidth: 1330
-  pixelHeight: 1182
+  pixelWidth: 1659
+  pixelHeight: 948
 
-hook: PostToolUse
-hook: PostToolUse Completed
+codex
+`raw/walk.png` is now written. I’m visually checking the saved file so the result is not just a copied path and dimension readout.
 hook: PreToolUse
 hook: PreToolUse Completed
 hook: PostToolUse
 hook: PostToolUse Completed
 codex
-Manual QA confirms the saved file opens as a six-pose horizontal walk strip on a cyan background. The generated canvas is larger than the 192x208 slot math in the prompt; I’m reporting the actual saved PNG dimensions as requested.
+The saved image visually contains six walk-cycle poses on the cyan chroma background. I’m doing one final workspace check before closing out with the dimension line.
+hook: PreToolUse
 hook: PreToolUse
 hook: PreToolUse Completed
-  ✓ Read `prompts/walk.txt` and confirm target path state
-  ✓ Generate the walk sprite sheet with the built-in image tool
-  ✓ Save output as `raw/walk.png` without touching other files
-  ✓ Print pixel dimensions for `raw/walk.png`
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc 'git status --short' in /Users/cmore/workspace/aipet/art/sprites/simeong-walk
+ succeeded in 0ms:
+ M ../simeong-fall-land/prompts/fall-land.txt
+ M ../simeong-fall-land/references/layout-guides/fall-land.png
+ M ../simeong-fall-land/sprite-request.json
+ M ../simeong-fall-open/frames/fall-open/frame-0.png
+ M ../simeong-fall-open/frames/fall-open/frame-1.png
+ M ../simeong-fall-open/frames/fall-open/frame-2.png
+ M codex-walk.log
+ M prompts/walk.txt
+ M raw/walk.png
+ M sprite-request.json
+ M ../../../public/packs/simeong/fall-open.apng
+?? ../simeong-edge2/
+?? ../simeong-idle2/
+?? ../simeong-idle3/
+?? ../simeong-walk2/
+
 hook: PostToolUse
 hook: PostToolUse Completed
 codex
-Saved to [raw/walk.png](/Users/cmore/workspace/aipet/art/sprites/simeong-walk/raw/walk.png).
+Saved [raw/walk.png](/Users/cmore/workspace/aipet/art/sprites/simeong-walk/raw/walk.png).
 
-Pixel dimensions: `1330 x 1182`.
+Pixel dimensions: `1659 x 948 px`.
+
+I visually checked the saved file: it contains a six-frame walk strip on the cyan chroma background. My only write targeted `raw/walk.png`.
 hook: Stop
 hook: Stop
 hook: Stop Completed
 hook: Stop Completed
 tokens used
-42,218
-Saved to [raw/walk.png](/Users/cmore/workspace/aipet/art/sprites/simeong-walk/raw/walk.png).
+42,481
+Saved [raw/walk.png](/Users/cmore/workspace/aipet/art/sprites/simeong-walk/raw/walk.png).
 
-Pixel dimensions: `1330 x 1182`.
+Pixel dimensions: `1659 x 948 px`.
+
+I visually checked the saved file: it contains a six-frame walk strip on the cyan chroma background. My only write targeted `raw/walk.png`.

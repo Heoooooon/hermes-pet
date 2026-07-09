@@ -37,35 +37,35 @@
       "frame_records": [
         {
           "index": 0,
-          "nontransparent_pixels": 9288,
+          "nontransparent_pixels": 9780,
           "bbox": [
-            56,
+            54,
             14,
-            139,
-            194
-          ],
-          "edge_pixels": 0,
-          "chroma_adjacent_pixels": 0
-        },
-        {
-          "index": 1,
-          "nontransparent_pixels": 9302,
-          "bbox": [
-            59,
-            14,
-            147,
+            144,
             194
           ],
           "edge_pixels": 0,
           "chroma_adjacent_pixels": 1
         },
         {
-          "index": 2,
-          "nontransparent_pixels": 8672,
+          "index": 1,
+          "nontransparent_pixels": 9953,
           "bbox": [
-            66,
+            49,
             14,
-            138,
+            145,
+            194
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 0
+        },
+        {
+          "index": 2,
+          "nontransparent_pixels": 9767,
+          "bbox": [
+            45,
+            14,
+            144,
             194
           ],
           "edge_pixels": 0,
@@ -73,39 +73,39 @@
         },
         {
           "index": 3,
-          "nontransparent_pixels": 8681,
+          "nontransparent_pixels": 9280,
           "bbox": [
-            67,
+            58,
             14,
-            141,
+            137,
             194
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 2
+          "chroma_adjacent_pixels": 0
         },
         {
           "index": 4,
-          "nontransparent_pixels": 9044,
-          "bbox": [
-            66,
-            14,
-            143,
-            194
-          ],
-          "edge_pixels": 0,
-          "chroma_adjacent_pixels": 3
-        },
-        {
-          "index": 5,
-          "nontransparent_pixels": 9779,
+          "nontransparent_pixels": 9688,
           "bbox": [
             49,
             14,
-            143,
+            144,
             194
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 1
+          "chroma_adjacent_pixels": 0
+        },
+        {
+          "index": 5,
+          "nontransparent_pixels": 9667,
+          "bbox": [
+            56,
+            14,
+            142,
+            194
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 0
         }
       ],
       "ok": true

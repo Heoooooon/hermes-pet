@@ -12,7 +12,7 @@
     "width": 192,
     "height": 256,
     "safe_margin_x": 18,
-    "safe_margin_y": 8
+    "safe_margin_y": 16
   },
   "chroma_key": {
     "name": "cyan",
@@ -31,7 +31,7 @@
       "frames": 4,
       "fps": 10,
       "loop": false,
-      "action": "parachute landing sequence, front-facing, body LARGE filling two thirds of the cell height. The parachute canopy is plain warm tan beige (#D9BE93), round and compact, matching the deployment canopy exactly - no stripes, no blue. Frame 1 feet about to touch the ground with the tan canopy still overhead, frame 2 knees bent absorbing the touchdown while the tan canopy deflates behind his shoulder, frame 3 standing up as the crumpled tan fabric drops out of sight, frame 4 standing upright and cheerful with no parachute visible; same body scale in every frame, feet planted on the same ground line from frame 2 on"
+      "action": "landing recovery, front-facing, NO parachute anywhere in any frame - the canopy is already gone. Frame 1 feet just touching the ground with knees slightly bent and arms out for balance, frame 2 deep knee bend absorbing the impact with both arms forward, frame 3 rising back up with arms relaxing to his sides, frame 4 standing fully upright and cheerful with both arms relaxed at his sides. Both arms and paws clearly drawn in every frame. Feet stay planted on the same ground line; the body scale is identical in all four frames and matches the reference standing pose"
     }
   },
   "style": "match the attached base/anchor reference image EXACTLY: same pixel density (logical pixel block size), same body proportions, same outline weight, same palette, same shading style, same level of detail. Do not restyle, do not change proportions, do not add or remove detail density. Avoid polished illustration, painterly rendering, anime key art, 3D render, vector app-icon polish, glossy lighting, soft gradients, and anti-aliased high-detail edges.",

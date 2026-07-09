@@ -7,7 +7,7 @@
     "width": 192,
     "height": 256,
     "safe_margin_x": 18,
-    "safe_margin_y": 8
+    "safe_margin_y": 16
   },
   "chroma_key": {
     "name": "cyan",
@@ -35,58 +35,56 @@
       "frame_records": [
         {
           "index": 0,
-          "nontransparent_pixels": 17254,
+          "nontransparent_pixels": 16372,
           "bbox": [
-            51,
-            8,
-            169,
-            248
+            25,
+            36,
+            181,
+            240
           ],
           "edge_pixels": 0,
           "chroma_adjacent_pixels": 0
         },
         {
           "index": 1,
-          "nontransparent_pixels": 24360,
+          "nontransparent_pixels": 21771,
           "bbox": [
-            36,
-            31,
-            192,
-            248
+            23,
+            16,
+            177,
+            240
           ],
-          "edge_pixels": 37,
-          "chroma_adjacent_pixels": 3
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 0
         },
         {
           "index": 2,
-          "nontransparent_pixels": 19440,
+          "nontransparent_pixels": 16582,
           "bbox": [
-            44,
-            8,
-            161,
-            248
+            43,
+            16,
+            158,
+            240
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 5
+          "chroma_adjacent_pixels": 0
         },
         {
           "index": 3,
-          "nontransparent_pixels": 18134,
+          "nontransparent_pixels": 14553,
           "bbox": [
-            49,
-            8,
-            152,
-            248
+            59,
+            16,
+            151,
+            240
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 3
+          "chroma_adjacent_pixels": 0
         }
       ],
       "ok": true
     }
   ],
   "errors": [],
-  "warnings": [
-    "fall-land: frame 01 has 37 non-transparent edge pixels"
-  ]
+  "warnings": []
 }

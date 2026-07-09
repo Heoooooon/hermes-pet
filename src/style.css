@@ -79,12 +79,19 @@ body[data-state="jet"].has-jet #pet {
 }
 
 /* 시멍 팩: 소품(낙하산·로켓)이 셀을 나눠 쓰는 상태는 몸집이 idle과 같아
-   보이도록 표시 폭을 키운다 (측정 기반: idle 몸높이 205px 기준). */
+   보이도록 표시 폭을 키운다 (측정 기반: idle 몸높이 205px 기준).
+   낙하산 착륙(land)은 시멍 단독이라 idle과 같은 폭으로 이어진다. */
+body[data-pack="simeong"][data-state="walk"].has-walk #pet {
+  width: 220px;
+}
 body[data-pack="simeong"][data-state="fall"].has-fall #pet {
-  width: 232px;
+  width: 238px;
+}
+body[data-pack="simeong"][data-state="fall"][data-fall-phase="land"] #pet {
+  width: 176px;
 }
 body[data-pack="simeong"][data-state="rocket"].has-rocket #pet {
-  width: 232px;
+  width: 238px;
 }
 body[data-pack="simeong"][data-state="edge"].has-edge #pet {
   width: 208px;

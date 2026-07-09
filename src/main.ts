@@ -69,7 +69,11 @@ const ONE_SHOT: ReadonlySet<State> = new Set(["fall", "edge"]);
 // deploy one-shot → glide loop → landing one-shot).
 const EXTRA_SPRITES = ["fall-open", "fall-glide", "fall-land"] as const;
 
-const loadedSprites = new Map<string, string>();
+// Each state can ship variants: <key>.apng (base) plus <key>.2.apng …
+// <key>.4.apng. Entering a state picks one at random, so the same action
+// doesn't always look identical.
+const VARIANT_SUFFIXES = [2, 3, 4];
+const spriteVariants = new Map<string, string[]>();
 let currentPack = "";
 
 function packUrl(pack: string, key: string): string {
@@ -79,31 +83,47 @@ function packUrl(pack: string, key: string): string {
 function loadPack(pack: string) {
   currentPack = pack;
   document.body.dataset.pack = pack; // pack-specific CSS (per-state sizes)
-  loadedSprites.clear();
+  spriteVariants.clear();
   for (const key of [...ALL_STATES, ...EXTRA_SPRITES]) {
     document.body.classList.remove(`has-${key}`);
-    const url = packUrl(pack, key);
-    const probe = new Image();
-    probe.onload = () => {
-      if (currentPack !== pack) return; // switched again while probing
-      loadedSprites.set(key, url);
-      document.body.classList.add(`has-${key}`);
-      if (state === key) pet.src = url; // refresh the visible sprite
-    };
-    probe.src = url;
+    probeSprite(pack, key, packUrl(pack, key), true);
+    for (const v of VARIANT_SUFFIXES) {
+      probeSprite(pack, key, `/packs/${pack}/${key}.${v}.apng`, false);
+    }
   }
   pet.src = packUrl(pack, "idle");
 }
 
-function spriteFor(target: State): string {
-  return loadedSprites.get(target) ?? packUrl(currentPack, "idle");
+function probeSprite(pack: string, key: string, url: string, isBase: boolean) {
+  const probe = new Image();
+  probe.onload = () => {
+    if (currentPack !== pack) return; // switched again while probing
+    const list = spriteVariants.get(key) ?? [];
+    if (isBase) list.unshift(url);
+    else list.push(url);
+    spriteVariants.set(key, list);
+    if (isBase) {
+      document.body.classList.add(`has-${key}`);
+      if (state === key) pet.src = url; // refresh the visible sprite
+    }
+  };
+  probe.src = url;
+}
+
+function spriteFor(target: string): string {
+  const list = spriteVariants.get(target);
+  if (list?.length) return list[Math.floor(Math.random() * list.length)];
+  return spriteVariants.get("idle")?.[0] ?? packUrl(currentPack, "idle");
 }
 
 function setState(next: State) {
+  const changed = state !== next;
   state = next;
   document.body.dataset.state = next;
+  delete document.body.dataset.fallPhase; // fall() re-tags its own phases
+  if (!changed && !ONE_SHOT.has(next)) return; // keep the current variant
   const src = spriteFor(next);
-  if (ONE_SHOT.has(next) && loadedSprites.has(next)) {
+  if (ONE_SHOT.has(next) && spriteVariants.has(next)) {
     pet.src = `${src}?t=${Date.now()}`;
   } else if (!pet.src.endsWith(src)) {
     pet.src = src;
@@ -206,8 +226,11 @@ async function fall(startY: number) {
   // (one-shot) → glide (loop) → landing (one-shot). Otherwise the single
   // fall sequence plays as before.
   const phased =
-    loadedSprites.has("fall-open") && loadedSprites.has("fall-glide");
-  if (phased) pet.src = `${loadedSprites.get("fall-open")}?t=${Date.now()}`;
+    spriteVariants.has("fall-open") && spriteVariants.has("fall-glide");
+  if (phased) {
+    pet.src = `${spriteFor("fall-open")}?t=${Date.now()}`;
+    document.body.dataset.fallPhase = "open";
+  }
   let gliding = false;
 
   const x = (await appWindow.outerPosition()).x; // x is fixed while falling
@@ -229,7 +252,8 @@ async function fall(startY: number) {
       vy = Math.max(drift, vy * 0.8); // brake into a gentle drift
       if (phased && !gliding) {
         gliding = true;
-        pet.src = loadedSprites.get("fall-glide")!;
+        pet.src = spriteFor("fall-glide");
+        document.body.dataset.fallPhase = "glide";
       }
     }
     // Re-target every tick so windows moving or closing mid-fall are
@@ -241,8 +265,9 @@ async function fall(startY: number) {
     if (y >= restY) {
       stopFall();
       standingOn = target;
-      if (phased && loadedSprites.has("fall-land")) {
-        pet.src = `${loadedSprites.get("fall-land")}?t=${Date.now()}`;
+      if (phased && spriteVariants.has("fall-land")) {
+        pet.src = `${spriteFor("fall-land")}?t=${Date.now()}`;
+        document.body.dataset.fallPhase = "land";
         setTimeout(() => {
           if (state !== "fall") return; // grabbed during touchdown
           setState("idle");
@@ -270,14 +295,14 @@ function scheduleNext() {
       if (state !== "idle") return scheduleNext();
       const roll = Math.random();
       const stunt = 0.12 * cfg.stunts;
-      if (roll < stunt && loadedSprites.has("rocket")) {
+      if (roll < stunt && spriteVariants.has("rocket")) {
         // A display above turns half the launches into a trip upstairs.
         const above = cfg.crossMonitors
           ? await verticalNeighbor(-1)
           : undefined;
         if (above && Math.random() < 0.5) void crossVertical(above, -1);
         else void rocketLaunch();
-      } else if (roll < stunt * 2 && loadedSprites.has("jet")) {
+      } else if (roll < stunt * 2 && spriteVariants.has("jet")) {
         void jetDash();
       } else if (roll < stunt * 2 + 0.1 && cfg.crossMonitors) {
         // Dive off the bottom of this screen when another sits below.

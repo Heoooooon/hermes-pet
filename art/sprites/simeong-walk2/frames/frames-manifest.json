@@ -1,0 +1,116 @@
+{
+  "ok": true,
+  "engine": "component-row",
+  "run_dir": "/Users/cmore/workspace/aipet/art/sprites/simeong-walk2",
+  "cell": {
+    "shape": "rect",
+    "width": 192,
+    "height": 208,
+    "safe_margin_x": 18,
+    "safe_margin_y": 14
+  },
+  "chroma_key": {
+    "name": "cyan",
+    "hex": "#00FFFF",
+    "rgb": [
+      0,
+      255,
+      255
+    ],
+    "selection": "auto",
+    "score": 212.65,
+    "min_subject_distance": 192.58
+  },
+  "rows": [
+    {
+      "state": "walk2",
+      "frames": 6,
+      "method": "components",
+      "files": [
+        "frames/walk2/frame-0.png",
+        "frames/walk2/frame-1.png",
+        "frames/walk2/frame-2.png",
+        "frames/walk2/frame-3.png",
+        "frames/walk2/frame-4.png",
+        "frames/walk2/frame-5.png"
+      ],
+      "frame_records": [
+        {
+          "index": 0,
+          "nontransparent_pixels": 12082,
+          "bbox": [
+            46,
+            14,
+            148,
+            194
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 0
+        },
+        {
+          "index": 1,
+          "nontransparent_pixels": 12614,
+          "bbox": [
+            38,
+            14,
+            159,
+            194
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 1
+        },
+        {
+          "index": 2,
+          "nontransparent_pixels": 12517,
+          "bbox": [
+            44,
+            14,
+            149,
+            194
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 1
+        },
+        {
+          "index": 3,
+          "nontransparent_pixels": 12380,
+          "bbox": [
+            44,
+            14,
+            150,
+            194
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 1
+        },
+        {
+          "index": 4,
+          "nontransparent_pixels": 13119,
+          "bbox": [
+            32,
+            14,
+            162,
+            194
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 5
+        },
+        {
+          "index": 5,
+          "nontransparent_pixels": 11460,
+          "bbox": [
+            54,
+            14,
+            157,
+            194
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 2
+        }
+      ],
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "warnings": []
+}

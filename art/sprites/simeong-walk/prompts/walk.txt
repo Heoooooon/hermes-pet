@@ -7,7 +7,7 @@ Style contract: match the attached base/anchor reference image EXACTLY: same pix
 
 Use this prompt as an authoritative sprite-production spec. Do not expand it into a polished illustration, painterly character image, anime key art, 3D render, vector mascot, glossy app icon, realistic portrait, or marketing artwork.
 
-Animation action: side-view walk cycle facing right: continuous locomotion, alternating legs with clear foot contact, arms swinging naturally, backpack and tail bobbing slightly.
+Animation action: side-view walk cycle facing right: continuous natural locomotion with alternating legs and clear foot contact. BOTH arms are clearly visible and swing naturally opposite to the legs - the near arm swings across the jacket, the far arm peeks past the backpack; hands drawn as clean rounded paws, never hidden in pockets, never fused with the body. Tail and ears bob gently. The body scale is identical in all six frames.
 
 Anchor lock:
 - Accepted idle/direction anchors own character identity, outfit details, colors, face design, asymmetric markings, and side-specific accessories for final action rows.

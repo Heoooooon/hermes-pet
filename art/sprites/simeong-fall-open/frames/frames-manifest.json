@@ -1,0 +1,90 @@
+{
+  "ok": true,
+  "engine": "component-row",
+  "run_dir": "/Users/cmore/workspace/aipet/art/sprites/simeong-fall-open",
+  "cell": {
+    "shape": "rect",
+    "width": 192,
+    "height": 256,
+    "safe_margin_x": 18,
+    "safe_margin_y": 8
+  },
+  "chroma_key": {
+    "name": "cyan",
+    "hex": "#00FFFF",
+    "rgb": [
+      0,
+      255,
+      255
+    ],
+    "selection": "auto",
+    "score": 212.65,
+    "min_subject_distance": 192.58
+  },
+  "rows": [
+    {
+      "state": "fall-open",
+      "frames": 4,
+      "method": "components",
+      "files": [
+        "frames/fall-open/frame-0.png",
+        "frames/fall-open/frame-1.png",
+        "frames/fall-open/frame-2.png",
+        "frames/fall-open/frame-3.png"
+      ],
+      "frame_records": [
+        {
+          "index": 0,
+          "nontransparent_pixels": 20246,
+          "bbox": [
+            20,
+            8,
+            167,
+            248
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 2
+        },
+        {
+          "index": 1,
+          "nontransparent_pixels": 18047,
+          "bbox": [
+            37,
+            8,
+            165,
+            248
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 0
+        },
+        {
+          "index": 2,
+          "nontransparent_pixels": 16849,
+          "bbox": [
+            39,
+            8,
+            148,
+            248
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 3
+        },
+        {
+          "index": 3,
+          "nontransparent_pixels": 15238,
+          "bbox": [
+            49,
+            8,
+            150,
+            248
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 0
+        }
+      ],
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "warnings": []
+}

@@ -65,10 +65,14 @@ const ALL_STATES: readonly State[] = [
 // One-shot APNGs (plays=1) need a cache-buster to replay on re-entry.
 const ONE_SHOT: ReadonlySet<State> = new Set(["fall", "edge"]);
 
-const loadedSprites = new Map<State, string>();
+// Optional multi-phase variants a pack may ship (fall gets three phases:
+// deploy one-shot → glide loop → landing one-shot).
+const EXTRA_SPRITES = ["fall-open", "fall-glide", "fall-land"] as const;
+
+const loadedSprites = new Map<string, string>();
 let currentPack = "";
 
-function packUrl(pack: string, key: State): string {
+function packUrl(pack: string, key: string): string {
   return `/packs/${pack}/${key}.apng`;
 }
 
@@ -76,7 +80,7 @@ function loadPack(pack: string) {
   currentPack = pack;
   document.body.dataset.pack = pack; // pack-specific CSS (per-state sizes)
   loadedSprites.clear();
-  for (const key of ALL_STATES) {
+  for (const key of [...ALL_STATES, ...EXTRA_SPRITES]) {
     document.body.classList.remove(`has-${key}`);
     const url = packUrl(pack, key);
     const probe = new Image();
@@ -198,6 +202,13 @@ async function settle() {
 async function fall(startY: number) {
   if (fallFrame) clearInterval(fallFrame);
   setState("fall");
+  // Three-phase parachute when the pack ships the variants: deploy
+  // (one-shot) → glide (loop) → landing (one-shot). Otherwise the single
+  // fall sequence plays as before.
+  const phased =
+    loadedSprites.has("fall-open") && loadedSprites.has("fall-glide");
+  if (phased) pet.src = `${loadedSprites.get("fall-open")}?t=${Date.now()}`;
+  let gliding = false;
 
   const x = (await appWindow.outerPosition()).x; // x is fixed while falling
   const cx = x + winW / 2;
@@ -216,6 +227,10 @@ async function fall(startY: number) {
       vy += gravity * dt;
     } else {
       vy = Math.max(drift, vy * 0.8); // brake into a gentle drift
+      if (phased && !gliding) {
+        gliding = true;
+        pet.src = loadedSprites.get("fall-glide")!;
+      }
     }
     // Re-target every tick so windows moving or closing mid-fall are
     // handled: she lands on whatever is actually below her feet.
@@ -226,8 +241,17 @@ async function fall(startY: number) {
     if (y >= restY) {
       stopFall();
       standingOn = target;
-      setState("idle");
-      scheduleNext();
+      if (phased && loadedSprites.has("fall-land")) {
+        pet.src = `${loadedSprites.get("fall-land")}?t=${Date.now()}`;
+        setTimeout(() => {
+          if (state !== "fall") return; // grabbed during touchdown
+          setState("idle");
+          scheduleNext();
+        }, 450);
+      } else {
+        setState("idle");
+        scheduleNext();
+      }
     }
   }, 16);
 }

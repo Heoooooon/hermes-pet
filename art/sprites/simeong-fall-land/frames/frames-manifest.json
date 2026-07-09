@@ -1,0 +1,92 @@
+{
+  "ok": true,
+  "engine": "component-row",
+  "run_dir": "/Users/cmore/workspace/aipet/art/sprites/simeong-fall-land",
+  "cell": {
+    "shape": "rect",
+    "width": 192,
+    "height": 256,
+    "safe_margin_x": 18,
+    "safe_margin_y": 8
+  },
+  "chroma_key": {
+    "name": "cyan",
+    "hex": "#00FFFF",
+    "rgb": [
+      0,
+      255,
+      255
+    ],
+    "selection": "auto",
+    "score": 212.65,
+    "min_subject_distance": 192.58
+  },
+  "rows": [
+    {
+      "state": "fall-land",
+      "frames": 4,
+      "method": "components",
+      "files": [
+        "frames/fall-land/frame-0.png",
+        "frames/fall-land/frame-1.png",
+        "frames/fall-land/frame-2.png",
+        "frames/fall-land/frame-3.png"
+      ],
+      "frame_records": [
+        {
+          "index": 0,
+          "nontransparent_pixels": 17254,
+          "bbox": [
+            51,
+            8,
+            169,
+            248
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 0
+        },
+        {
+          "index": 1,
+          "nontransparent_pixels": 24360,
+          "bbox": [
+            36,
+            31,
+            192,
+            248
+          ],
+          "edge_pixels": 37,
+          "chroma_adjacent_pixels": 3
+        },
+        {
+          "index": 2,
+          "nontransparent_pixels": 19440,
+          "bbox": [
+            44,
+            8,
+            161,
+            248
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 5
+        },
+        {
+          "index": 3,
+          "nontransparent_pixels": 18134,
+          "bbox": [
+            49,
+            8,
+            152,
+            248
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 3
+        }
+      ],
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    "fall-land: frame 01 has 37 non-transparent edge pixels"
+  ]
+}

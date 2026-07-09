@@ -226,14 +226,24 @@ function stopFall() {
 function scheduleNext() {
   if (walkTimer) clearTimeout(walkTimer);
   walkTimer = setTimeout(
-    () => {
+    async () => {
       if (state !== "idle") return scheduleNext();
       const roll = Math.random();
       const stunt = 0.12 * cfg.stunts;
       if (roll < stunt && loadedSprites.has("rocket")) {
-        void rocketLaunch();
+        // A display above turns half the launches into a trip upstairs.
+        const above = cfg.crossMonitors
+          ? await verticalNeighbor(-1)
+          : undefined;
+        if (above && Math.random() < 0.5) void crossVertical(above, -1);
+        else void rocketLaunch();
       } else if (roll < stunt * 2 && loadedSprites.has("jet")) {
         void jetDash();
+      } else if (roll < stunt * 2 + 0.1 && cfg.crossMonitors) {
+        // Dive off the bottom of this screen when another sits below.
+        const below = await verticalNeighbor(1);
+        if (below) void crossVertical(below, 1);
+        else walk();
       } else if (roll < 0.8) {
         walk();
       } else {
@@ -553,6 +563,87 @@ let crossFrame: ReturnType<typeof setInterval> | null = null;
 function stopCross() {
   if (crossFrame) clearInterval(crossFrame);
   crossFrame = null;
+}
+
+// A display stacked directly above (-1) or below (1) the current one whose
+// horizontal span covers the pet's position, judged in logical points.
+async function verticalNeighbor(dir: -1 | 1): Promise<Monitor | undefined> {
+  try {
+    const pos = await appWindow.outerPosition();
+    const x = pos.x / scale;
+    const lw = winW / scale;
+    const cur = { y: monY / scale, h: monH / scale };
+    const boundary = dir === 1 ? cur.y + cur.h : cur.y;
+    const monitors = await availableMonitors();
+    return monitors.find((m) => {
+      const r = logicalRect(m);
+      const touches =
+        dir === 1
+          ? Math.abs(r.y - boundary) <= 16
+          : Math.abs(r.y + r.h - boundary) <= 16;
+      if (!touches) return false;
+      // She keeps her x while crossing, so the spot must exist over there.
+      return x >= r.x - 40 && x + lw <= r.x + r.w + 40;
+    });
+  } catch {
+    return undefined;
+  }
+}
+
+// Cross into a display stacked above or below: dive off the bottom of the
+// upper screen under the parachute, or rocket up through the top into the
+// screen above. Animated in logical points like crossTo.
+async function crossVertical(m: Monitor, dir: -1 | 1) {
+  const pos = await appWindow.outerPosition();
+  const lw = winW / scale;
+  const lh = winH / scale;
+  let x = pos.x / scale;
+  let y = pos.y / scale;
+  const r = logicalRect(m);
+  const targetX = Math.min(Math.max(x, r.x + 8), r.x + r.w - lw - 8);
+  // Far enough into the new screen for currentMonitor() to agree, then the
+  // regular parachute drop finds whatever is below her feet over there.
+  const arriveY =
+    dir === 1 ? r.y + 8 : Math.max(r.y + 24, r.y + r.h - lh - 180);
+
+  const arrive = async () => {
+    stopCross();
+    await refreshMonitor();
+    await refreshPlatforms();
+    standingOn = null;
+    void fall(Math.round(y * scale));
+  };
+
+  if (dir === -1) {
+    setState("rocket");
+    document.body.classList.add("ignite");
+    await new Promise((resolve) => setTimeout(resolve, 650));
+    document.body.classList.remove("ignite");
+    if ((state as State) !== "rocket") return; // grabbed during ignition
+  } else {
+    setState("fall");
+  }
+
+  const dt = 0.016;
+  let vy = 0;
+  let elapsed = 0;
+  crossFrame = setInterval(async () => {
+    if (state !== (dir === -1 ? "rocket" : "fall")) return stopCross();
+    elapsed += 16;
+    if (dir === -1) {
+      vy = Math.min(vy + 1700 * dt, 1200); // logical pt/s, upward
+      y -= vy * dt;
+    } else {
+      // Freefall off the edge, then the chute opens and brakes the drop.
+      if (elapsed < 550) vy += 1300 * dt;
+      else vy = Math.max(300, vy * 0.8);
+      y += vy * dt;
+    }
+    x += (targetX - x) * 0.05;
+    const arrived = dir === -1 ? y <= arriveY : y >= arriveY;
+    await appWindow.setPosition(new LogicalPosition(x, y));
+    if (arrived) await arrive();
+  }, 16);
 }
 
 // Cross into the adjacent monitor without teleporting. Floors rarely line

@@ -12,7 +12,7 @@
     "width": 192,
     "height": 256,
     "safe_margin_x": 18,
-    "safe_margin_y": 10
+    "safe_margin_y": 8
   },
   "chroma_key": {
     "name": "cyan",
@@ -31,13 +31,13 @@
       "frames": 6,
       "fps": 8,
       "loop": false,
-      "action": "skydiving then parachuting, front-facing: first two frames arms up free-falling with flapping ears, then a small round tan parachute opens above him, last frames gently descending holding the straps, calm face; the final frame is a steady hold with the parachute fully open"
+      "action": "parachuting descent, front-facing. His body is LARGE, filling roughly two thirds of the cell height, same body scale as a standing pose. A compact round tan parachute hugs close above his head on short lines - the canopy is small, about half his body height. First frame arms up mid-air, second frame the compact canopy pops open, remaining frames gently descending holding the straps, calm face; the final frame is a steady hold with the canopy open"
     }
   },
   "style": "match the attached base/anchor reference image EXACTLY: same pixel density (logical pixel block size), same body proportions, same outline weight, same palette, same shading style, same level of detail. Do not restyle, do not change proportions, do not add or remove detail density. Avoid polished illustration, painterly rendering, anime key art, 3D render, vector app-icon polish, glossy lighting, soft gradients, and anti-aliased high-detail edges.",
   "motion_phase_guides": false,
   "fit": {
     "align_x": "centroid",
-    "align_y": "center"
+    "align_y": "bottom"
   }
 }

@@ -7,7 +7,7 @@
     "width": 192,
     "height": 256,
     "safe_margin_x": 18,
-    "safe_margin_y": 10
+    "safe_margin_y": 8
   },
   "chroma_key": {
     "name": "cyan",
@@ -37,75 +37,75 @@
       "frame_records": [
         {
           "index": 0,
-          "nontransparent_pixels": 20597,
+          "nontransparent_pixels": 21736,
           "bbox": [
-            33,
-            10,
-            172,
-            246
+            23,
+            8,
+            165,
+            248
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 7
+          "chroma_adjacent_pixels": 14
         },
         {
           "index": 1,
-          "nontransparent_pixels": 18212,
+          "nontransparent_pixels": 16479,
           "bbox": [
-            20,
-            23,
-            176,
-            232
+            46,
+            8,
+            145,
+            248
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 2
+          "chroma_adjacent_pixels": 4
         },
         {
           "index": 2,
-          "nontransparent_pixels": 15931,
+          "nontransparent_pixels": 16044,
           "bbox": [
-            28,
-            10,
-            153,
-            246
+            47,
+            8,
+            147,
+            248
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 7
+          "chroma_adjacent_pixels": 2
         },
         {
           "index": 3,
-          "nontransparent_pixels": 15006,
+          "nontransparent_pixels": 16308,
           "bbox": [
-            51,
-            10,
-            151,
-            246
+            46,
+            8,
+            146,
+            248
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 31
+          "chroma_adjacent_pixels": 8
         },
         {
           "index": 4,
-          "nontransparent_pixels": 14504,
+          "nontransparent_pixels": 16320,
           "bbox": [
             47,
-            10,
-            147,
-            246
+            8,
+            146,
+            248
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 2
+          "chroma_adjacent_pixels": 1
         },
         {
           "index": 5,
-          "nontransparent_pixels": 13395,
+          "nontransparent_pixels": 16425,
           "bbox": [
-            49,
-            10,
-            144,
-            246
+            46,
+            8,
+            146,
+            248
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 2
+          "chroma_adjacent_pixels": 9
         }
       ],
       "ok": true

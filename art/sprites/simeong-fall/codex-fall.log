@@ -8,7 +8,7 @@ approval: never
 sandbox: workspace-write [workdir, /tmp, $TMPDIR]
 reasoning effort: xhigh
 reasoning summaries: none
-session id: 019f4574-d40f-7943-963d-b3237d8d132f
+session id: 019f4592-72dd-7cb1-b79a-1064ecef3a62
 --------
 user
 You are running one step of the sprite-gen pipeline in this directory.
@@ -62,14 +62,15 @@ hook: UserPromptSubmit Completed
 hook: UserPromptSubmit Completed
 hook: UserPromptSubmit Completed
 codex
-I detect implementation intent: you want this sprite generation step executed exactly, with only `raw/fall.png` created or replaced. I’m reading the local image-generation instructions and prompt before invoking the generator.
+I detect an execution task: generate one sprite sheet from the existing prompt and save only the requested output. I’m reading the required local instructions and prompt first, then I’ll generate, save, and inspect the image dimensions.
 hook: PreToolUse
 hook: PreToolUse
 hook: PreToolUse Completed
 hook: PreToolUse Completed
 exec
-/bin/zsh -lc "sed -n '1,240p' /Users/cmore/.codex/skills/.system/imagegen/SKILL.md && sed -n '1,240p' prompts/fall.txt && ls -l base-source.png references/layout-guides/fall.png" in /Users/cmore/workspace/aipet/art/sprites/simeong-fall
+/bin/zsh -lc "pwd && sed -n '1,220p' /Users/cmore/.codex/skills/.system/imagegen/SKILL.md" in /Users/cmore/workspace/aipet/art/sprites/simeong-fall
  succeeded in 0ms:
+/Users/cmore/workspace/aipet/art/sprites/simeong-fall
 ---
 name: "imagegen"
 description: "Generate or edit raster images when the task benefits from AI-created bitmap visuals such as photos, illustrations, textures, sprites, mockups, or transparent-background cutouts. Use when Codex should create a brand-new image, transform an existing image, or derive visual variants from references, and the output should be a bitmap asset rather than repo-native code or vector. Do not use when the task is better handled by editing existing SVG/vector/code-native assets, extending an established icon or logo system, or building the visual directly in HTML/CSS/canvas."
@@ -290,26 +291,16 @@ Primary request: <user's main prompt>
 Input images: <Image 1: role; Image 2: role> (optional)
 Scene/backdrop: <environment>
 Subject: <main subject>
-Style/medium: <photo/illustration/3D/etc>
-Composition/framing: <wide/close/top-down; placement>
-Lighting/mood: <lighting + mood>
-Color palette: <palette notes>
-Materials/textures: <surface details>
-Text (verbatim): "<exact text>"
-Constraints: <must keep/must avoid>
-Avoid: <negative constraints>
-```
 
-Notes:
-- `Asset type` and `Input images` are prompt scaffolding, not dedicated CLI flags.
-- `Scene/backdrop` refers to the visual setting. It is not the same as the fallback CLI `background` parameter, which controls output transparency behavior.
-- Fallback-only execution notes such as `Quality:`, `Input fidelity:`, masks, output format, and output paths belong in the CLI path only. Do not treat them as built-in `image_gen` tool arguments.
-
-Augmentation rules:
-- Keep it short.
-- Add only the details needed to improve the prompt materially.
-- For edits, explicitly list invariants (`change only X; keep Y unchanged`).
-- If any critical detail is missing and blocks success, ask a question; otherwise proceed.
+hook: PostToolUse
+hook: PostToolUse Completed
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc "sed -n '1,240p' prompts/fall.txt" in /Users/cmore/workspace/aipet/art/sprites/simeong-fall
+ succeeded in 0ms:
 Create a single horizontal sprite strip for the game character `simeong-fall` in the state `fall`.
 
 If this is a pre-idle/simple run, the attached base image may be used as the canonical character design. In direction-anchor mode, do not use base images for final action rows; accepted idle/direction anchors own row identity. Use the attached accepted idle/direction anchor as the canonical character design for this row. If a state anchor is attached for a non-locomotion state, treat it as approved state vocabulary only. Use the attached layout guide image only for frame count, slot spacing, centering, and safe padding. If an additional generated row strip is attached, use it only as a motion reference, never as a replacement identity source. Do not simply copy the still reference pose. Generate distinct animation poses that create a readable cycle or action.
@@ -319,7 +310,7 @@ Style contract: match the attached base/anchor reference image EXACTLY: same pix
 
 Use this prompt as an authoritative sprite-production spec. Do not expand it into a polished illustration, painterly character image, anime key art, 3D render, vector mascot, glossy app icon, realistic portrait, or marketing artwork.
 
-Animation action: skydiving then parachuting, front-facing: first two frames arms up free-falling with flapping ears, then a small round tan parachute opens above him, last frames gently descending holding the straps, calm face; the final frame is a steady hold with the parachute fully open.
+Animation action: parachuting descent, front-facing. His body is LARGE, filling roughly two thirds of the cell height, same body scale as a standing pose. A compact round tan parachute hugs close above his head on short lines - the canopy is small, about half his body height. First frame arms up mid-air, second frame the compact canopy pops open, remaining frames gently descending holding the straps, calm face; the final frame is a steady hold with the canopy open.
 
 Anchor lock:
 - Accepted idle/direction anchors own character identity, outfit details, colors, face design, asymmetric markings, and side-specific accessories for final action rows.
@@ -351,58 +342,213 @@ Layout requirements:
 - Use a perfectly flat pure cyan #00FFFF chroma-key background across the whole image.
 - Do not use #00FFFF, pure cyan, or chroma-adjacent colors in the character, highlights, props, shadows, or effects.
 - Keep the rendering faithful to the attached reference sprite: same outline weight, same palette, same detail level — do not restyle it.
-- Keep every frame self-contained with at least 18 px horizontal and 10 px vertical safe padding. No character body part should be clipped by the frame slot.
+- Keep every frame self-contained with at least 18 px horizontal and 8 px vertical safe padding. No character body part should be clipped by the frame slot.
 - Avoid motion blur. Use clear pose changes readable at 192x256.
 - Preserve the same silhouette, face, proportions, palette, material, and props across every frame.
 
 Output only the sprite strip image.
--rw-r--r--@ 1 cmore  staff  427264 Jul  9 14:50 base-source.png
--rw-r--r--@ 1 cmore  staff    1716 Jul  9 14:52 references/layout-guides/fall.png
 
 hook: PostToolUse
 hook: PostToolUse Completed
-hook: PreToolUse
-hook: PreToolUse Completed
-  ✓ Read `prompts/fall.txt` and confirm reference assets are present
-  → Generate the fall sprite strip with `image_gen` using the prompt verbatim
-  • Save the generated PNG as `raw/fall.png`
-  • Print `raw/fall.png` pixel dimensions
-hook: PostToolUse
-hook: PostToolUse Completed
 codex
-I’ve confirmed the prompt and both reference images are present. I’m invoking the built-in image generator now; the prompt is passed verbatim from `prompts/fall.txt`.
-codex
-Generation completed. I’m locating the emitted file under Codex’s generated-images directory, then I’ll copy that exact PNG into `raw/fall.png` and report its dimensions.
-hook: PreToolUse
-hook: PreToolUse Completed
-  ✓ Read `prompts/fall.txt` and confirm reference assets are present
-  ✓ Generate the fall sprite strip with `image_gen` using the prompt verbatim
-  → Save the generated PNG as `raw/fall.png`
-  • Print `raw/fall.png` pixel dimensions
-hook: PostToolUse
-hook: PostToolUse Completed
+I’m using the `imagegen` skill because this is a project-bound bitmap sprite asset. The prompt file is already specific, so I’ll pass its contents verbatim to the image tool and only do local file placement afterward.
 hook: PreToolUse
 hook: PreToolUse
 hook: PreToolUse Completed
 hook: PreToolUse Completed
 exec
-/bin/zsh -lc "find \"/Users/cmore/Library/Application Support/orca/codex-runtime-home/home/generated_images/019f4574-d40f-7943-963d-b3237d8d132f\" -type f -name '*.png' -maxdepth 2 -print -exec stat -f '%m %z %N' {} \\; | sort -n | tail -20" in /Users/cmore/workspace/aipet/art/sprites/simeong-fall
+/bin/zsh -lc "sed -n '221,520p' /Users/cmore/.codex/skills/.system/imagegen/SKILL.md" in /Users/cmore/workspace/aipet/art/sprites/simeong-fall
  succeeded in 0ms:
-/Users/cmore/Library/Application Support/orca/codex-runtime-home/home/generated_images/019f4574-d40f-7943-963d-b3237d8d132f/ig_01a3c5c31b7e0f57016a4f38a7fd1081919d0a616f5e4ad64c.png
-1783576800 1564915 /Users/cmore/Library/Application Support/orca/codex-runtime-home/home/generated_images/019f4574-d40f-7943-963d-b3237d8d132f/ig_01a3c5c31b7e0f57016a4f38a7fd1081919d0a616f5e4ad64c.png
+Style/medium: <photo/illustration/3D/etc>
+Composition/framing: <wide/close/top-down; placement>
+Lighting/mood: <lighting + mood>
+Color palette: <palette notes>
+Materials/textures: <surface details>
+Text (verbatim): "<exact text>"
+Constraints: <must keep/must avoid>
+Avoid: <negative constraints>
+```
+
+Notes:
+- `Asset type` and `Input images` are prompt scaffolding, not dedicated CLI flags.
+- `Scene/backdrop` refers to the visual setting. It is not the same as the fallback CLI `background` parameter, which controls output transparency behavior.
+- Fallback-only execution notes such as `Quality:`, `Input fidelity:`, masks, output format, and output paths belong in the CLI path only. Do not treat them as built-in `image_gen` tool arguments.
+
+Augmentation rules:
+- Keep it short.
+- Add only the details needed to improve the prompt materially.
+- For edits, explicitly list invariants (`change only X; keep Y unchanged`).
+- If any critical detail is missing and blocks success, ask a question; otherwise proceed.
+
+## Examples
+
+### Generation example (hero image)
+```text
+Use case: product-mockup
+Asset type: landing page hero
+Primary request: a minimal hero image of a ceramic coffee mug
+Style/medium: clean product photography
+Composition/framing: wide composition with usable negative space for page copy if needed
+Lighting/mood: soft studio lighting
+Constraints: no logos, no text, no watermark
+```
+
+### Edit example (invariants)
+```text
+Use case: precise-object-edit
+Asset type: product photo background replacement
+Primary request: replace only the background with a warm sunset gradient
+Constraints: change only the background; keep the product and its edges unchanged; no text; no watermark
+```
+
+## Prompting best practices
+- Structure prompt as scene/backdrop -> subject -> details -> constraints.
+- Include intended use (ad, UI mock, infographic) to set the mode and polish level.
+- Use camera/composition language for photorealism.
+- Only use SVG/vector stand-ins when the user explicitly asked for vector output or a non-image placeholder.
+- Quote exact text and specify typography + placement.
+- For tricky words, spell them letter-by-letter and require verbatim rendering.
+- For multi-image inputs, reference images by index and describe how they should be used.
+- For edits, repeat invariants every iteration to reduce drift.
+- Iterate with single-change follow-ups.
+- If the prompt is generic, add only the extra detail that will materially help.
+- If the prompt is already detailed, normalize it instead of expanding it.
+- For CLI fallback only, see `references/cli.md` and `references/image-api.md` for model, `quality`, `input_fidelity`, masks, output format, and output-path guidance.
+- For transparent images, use the built-in-first chroma-key workflow unless the request is complex enough to need true CLI transparency; ask before switching to CLI `gpt-image-1.5`.
+
+More principles shared by both modes: `references/prompting.md`.
+Copy/paste specs shared by both modes: `references/sample-prompts.md`.
+
+## Guidance by asset type
+Asset-type templates (website assets, game assets, wireframes, logo) are consolidated in `references/sample-prompts.md`.
+
+## gpt-image-2 guidance for CLI fallback
+
+The fallback CLI defaults to `gpt-image-2`.
+
+- Use `gpt-image-2` for new CLI/API workflows unless the request needs true model-native transparent output.
+- If a transparent request may need CLI fallback, ask before using `gpt-image-1.5` unless the user already explicitly requested `gpt-image-1.5`, `scripts/image_gen.py`, or CLI fallback. Explain that the built-in chroma-key path is the default, but true transparency requires `gpt-image-1.5` because `gpt-image-2` does not support `background=transparent`.
+- `gpt-image-2` always uses high fidelity for image inputs; do not set `input_fidelity` with this model.
+- `gpt-image-2` supports `quality` values `low`, `medium`, `high`, and `auto`.
+- Use `quality low` for fast drafts, thumbnails, and quick iterations. Use `medium`, `high`, or `auto` for final assets, dense text, diagrams, identity-sensitive edits, or high-resolution outputs.
+- Square images are typically fastest to generate. Use `1024x1024` for fast square drafts.
+- If the user asks for 4K-style output, use `3840x2160` for landscape or `2160x3840` for portrait.
+- `gpt-image-2` size may be `auto` or `WIDTHxHEIGHT` if all constraints hold: max edge `<= 3840px`, both edges multiples of `16px`, long-to-short ratio `<= 3:1`, total pixels between `655,360` and `8,294,400`.
+
+Popular `gpt-image-2` sizes:
+- `1024x1024` square
+- `1536x1024` landscape
+- `1024x1536` portrait
+- `2048x2048` 2K square
+- `2048x1152` 2K landscape
+- `3840x2160` 4K landscape
+- `2160x3840` 4K portrait
+- `auto`
+
+## Fallback CLI mode only
+
+### Temp and output conventions
+These conventions apply only to the CLI fallback. They do not describe built-in `image_gen` output behavior.
+- Use `tmp/imagegen/` for intermediate files (for example JSONL batches); delete them when done.
+- Write final artifacts under `output/imagegen/`.
+- Use `--out` or `--out-dir` to control output paths; keep filenames stable and descriptive.
+
+### Dependencies
+Prefer `uv` for dependency management in this repo.
+
+Required Python package:
+```bash
+uv pip install openai
+```
+
+Required for local chroma-key removal and optional downscaling:
+```bash
+uv pip install pillow
+```
+
+Portability note:
+- If you are using the installed skill outside this repo, install dependencies into that environment with its package manager.
+- In uv-managed environments, `uv pip install ...` remains the preferred path.
+
+### Environment
+- `OPENAI_API_KEY` must be set for live API calls.
+- Do not ask the user for `OPENAI_API_KEY` when using the built-in `image_gen` tool.
+- Never ask the user to paste the full key in chat. Ask them to set it locally and confirm when ready.
+
+If the key is missing, give the user these steps:
+1. Create an API key in the OpenAI platform UI: https://platform.openai.com/api-keys
+2. Set `OPENAI_API_KEY` as an environment variable in their system.
+3. Offer to guide them through setting the environment variable for their OS/shell if needed.
+
+If installation is not possible in this environment, tell the user which dependency is missing and how to install it into their active environment.
+
+### Script-mode notes
+- CLI commands + examples: `references/cli.md`
+- API parameter quick reference: `references/image-api.md`
+- Network approvals / sandbox settings for CLI mode: `references/codex-network.md`
+
+## Reference map
+- `references/prompting.md`: shared prompting principles for both modes.
+- `references/sample-prompts.md`: shared copy/paste prompt recipes for both modes.
+- `references/cli.md`: fallback-only CLI usage via `scripts/image_gen.py`.
+- `references/image-api.md`: fallback-only API/CLI parameter reference.
+- `references/codex-network.md`: fallback-only network/sandbox troubleshooting for CLI mode.
+- `scripts/image_gen.py`: fallback-only CLI implementation. Do not load or use it unless the user explicitly chooses CLI mode or explicitly confirms a transparent request's true CLI transparency fallback.
+- `$CODEX_HOME/skills/.system/imagegen/scripts/remove_chroma_key.py`: local post-processing helper for built-in transparent-image requests.
 
 hook: PostToolUse
 hook: PostToolUse Completed
+hook: PreToolUse
+hook: PreToolUse Completed
+  → Generate the fall sprite strip from the verbatim prompt with the attached character and layout references
+  • Place the generated PNG at `raw/fall.png` without touching other project files
+  • Inspect `raw/fall.png` and report its pixel dimensions
+hook: PostToolUse
+hook: PostToolUse Completed
 codex
-I’m copying the generated PNG into the requested workspace path now. After that I’ll inspect the saved file and use the image metadata to print the actual pixel size.
+The image generation finished. I’m locating the generated file under the built-in image output directory so I can copy only the selected PNG into `raw/fall.png`.
+hook: PreToolUse
+hook: PreToolUse Completed
+  ✓ Generate the fall sprite strip from the verbatim prompt with the attached character and layout references
+  → Place the generated PNG at `raw/fall.png` without touching other project files
+  • Inspect `raw/fall.png` and report its pixel dimensions
+hook: PostToolUse
+hook: PostToolUse Completed
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc 'ls -la raw 2>/dev/null || true' in /Users/cmore/workspace/aipet/art/sprites/simeong-fall
+ succeeded in 0ms:
+total 3064
+drwxr-xr-x@  3 cmore  staff       96 Jul  9 15:00 .
+drwxr-xr-x@ 10 cmore  staff      320 Jul  9 15:07 ..
+-rw-r--r--@  1 cmore  staff  1564915 Jul  9 15:00 fall.png
+
+hook: PostToolUse
+exec
+/bin/zsh -lc 'find "$HOME/Library/Application Support/orca/codex-runtime-home/home/generated_images" -type f -name '"'*.png' -mmin -30 -print0 | xargs -0 ls -lt" in /Users/cmore/workspace/aipet/art/sprites/simeong-fall
+ succeeded in 0ms:
+-rw-r--r--@ 1 cmore  staff  1552568 Jul  9 15:32 /Users/cmore/Library/Application Support/orca/codex-runtime-home/home/generated_images/019f4592-72dd-7cb1-b79a-1064ecef3a62/ig_0981313c1fa1432e016a4f40449498819babbab84779cd7b80.png
+-rw-r--r--@ 1 cmore  staff  1341551 Jul  9 15:09 /Users/cmore/Library/Application Support/orca/codex-runtime-home/home/generated_images/019f457d-9d44-7ce2-9cf5-2be1b2b73130/ig_0839608560e242d9016a4f3ae5d52c81919df8af8f45aa15be.png
+-rw-r--r--@ 1 cmore  staff  1706019 Jul  9 15:06 /Users/cmore/Library/Application Support/orca/codex-runtime-home/home/generated_images/019f4579-c24b-7aa1-9ed1-78b645144387/ig_0c572667e509664d016a4f39f8fc8881918ba65e5169684ef6.png
+
+hook: PostToolUse
+hook: PostToolUse Completed
+hook: PostToolUse Completed
+codex
+`raw/fall.png` already exists, and the user explicitly requested this output path, so I’m replacing that file with the newly generated PNG and then reading its dimensions.
 hook: PreToolUse
 hook: PreToolUse
 hook: PreToolUse Completed
 hook: PreToolUse Completed
 exec
-/bin/zsh -lc 'mkdir -p raw
-cp "/Users/cmore/Library/Application Support/orca/codex-runtime-home/home/generated_images/019f4574-d40f-7943-963d-b3237d8d132f/ig_01a3c5c31b7e0f57016a4f38a7fd1081919d0a616f5e4ad64c.png" raw/fall.png
-sips -g pixelWidth -g pixelHeight raw/fall.png' in /Users/cmore/workspace/aipet/art/sprites/simeong-fall
+/bin/zsh -lc 'mkdir -p raw && cp "$HOME/Library/Application Support/orca/codex-runtime-home/home/generated_images/019f4592-72dd-7cb1-b79a-1064ecef3a62/ig_0981313c1fa1432e016a4f40449498819babbab84779cd7b80.png" raw/fall.png && sips -g pixelWidth -g pixelHeight raw/fall.png' in /Users/cmore/workspace/aipet/art/sprites/simeong-fall
  succeeded in 0ms:
 /Users/cmore/workspace/aipet/art/sprites/simeong-fall/raw/fall.png
   pixelWidth: 1881
@@ -410,38 +556,36 @@ sips -g pixelWidth -g pixelHeight raw/fall.png' in /Users/cmore/workspace/aipet/
 
 hook: PostToolUse
 hook: PostToolUse Completed
+codex
+The file is now in place and `sips` reports `1881 x 836`. I’m doing one visual read of the saved PNG to make sure the artifact is actually present and opens as an image before closing out.
 hook: PreToolUse
 hook: PreToolUse Completed
-  ✓ Read `prompts/fall.txt` and confirm reference assets are present
-  ✓ Generate the fall sprite strip with `image_gen` using the prompt verbatim
-  ✓ Save the generated PNG as `raw/fall.png`
-  → Print `raw/fall.png` pixel dimensions
+  ✓ Generate the fall sprite strip from the verbatim prompt with the attached character and layout references
+  ✓ Place the generated PNG at `raw/fall.png` without touching other project files
+  → Inspect `raw/fall.png` and report its pixel dimensions
+hook: PostToolUse
+hook: PostToolUse Completed
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PostToolUse
+hook: PostToolUse Completed
+hook: PreToolUse
+hook: PreToolUse Completed
+  ✓ Generate the fall sprite strip from the verbatim prompt with the attached character and layout references
+  ✓ Place the generated PNG at `raw/fall.png` without touching other project files
+  ✓ Inspect `raw/fall.png` and report its pixel dimensions
 hook: PostToolUse
 hook: PostToolUse Completed
 codex
-The saved file is in place at `raw/fall.png`; its metadata reports `1881 x 836`. I’m doing one visual open of the saved artifact to confirm the file is readable from the requested path.
-hook: PreToolUse
-hook: PreToolUse Completed
-hook: PostToolUse
-hook: PostToolUse Completed
-hook: PreToolUse
-hook: PreToolUse Completed
-  ✓ Read `prompts/fall.txt` and confirm reference assets are present
-  ✓ Generate the fall sprite strip with `image_gen` using the prompt verbatim
-  ✓ Save the generated PNG as `raw/fall.png`
-  ✓ Print `raw/fall.png` pixel dimensions
-hook: PostToolUse
-hook: PostToolUse Completed
-codex
-Saved generated sprite strip to `raw/fall.png`.
+Saved generated sprite strip to [raw/fall.png](/Users/cmore/workspace/aipet/art/sprites/simeong-fall/raw/fall.png).
 
-Pixel dimensions: `1881 x 836`
+Pixel dimensions: `1881 x 836`.
 hook: Stop
 hook: Stop
 hook: Stop Completed
 hook: Stop Completed
 tokens used
-39,219
-Saved generated sprite strip to `raw/fall.png`.
+42,808
+Saved generated sprite strip to [raw/fall.png](/Users/cmore/workspace/aipet/art/sprites/simeong-fall/raw/fall.png).
 
-Pixel dimensions: `1881 x 836`
+Pixel dimensions: `1881 x 836`.

@@ -10,9 +10,9 @@
   "cell": {
     "shape": "rect",
     "width": 256,
-    "height": 176,
-    "safe_margin_x": 16,
-    "safe_margin_y": 14
+    "height": 192,
+    "safe_margin_x": 14,
+    "safe_margin_y": 10
   },
   "chroma_key": {
     "name": "cyan",
@@ -31,7 +31,7 @@
       "frames": 4,
       "fps": 10,
       "loop": true,
-      "action": "sitting astride a small horizontal cartoon rocket flying to the right like riding a horse, side view, leaning forward holding the nose, ears and tail streaming behind, bright orange flame trailing from the rocket tail flickering differently in each frame; only the flame, ears and tail change between frames, pose stays fixed"
+      "action": "sitting astride a small horizontal cartoon rocket flying to the right like riding a horse, side view. His body is LARGE, filling most of the cell height, same body scale as a standing pose; the rocket is short and stubby beneath him, bright orange flame trailing behind flickering differently in each frame; leaning forward holding the nose, ears and tail streaming behind; only the flame, ears and tail change between frames, pose stays fixed"
     }
   },
   "style": "match the attached base/anchor reference image EXACTLY: same pixel density (logical pixel block size), same body proportions, same outline weight, same palette, same shading style, same level of detail. Do not restyle, do not change proportions, do not add or remove detail density. Avoid polished illustration, painterly rendering, anime key art, 3D render, vector app-icon polish, glossy lighting, soft gradients, and anti-aliased high-detail edges.",

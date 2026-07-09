@@ -5,9 +5,9 @@
   "cell": {
     "shape": "rect",
     "width": 256,
-    "height": 176,
-    "safe_margin_x": 16,
-    "safe_margin_y": 14
+    "height": 192,
+    "safe_margin_x": 14,
+    "safe_margin_y": 10
   },
   "chroma_key": {
     "name": "cyan",
@@ -35,51 +35,51 @@
       "frame_records": [
         {
           "index": 0,
-          "nontransparent_pixels": 12025,
+          "nontransparent_pixels": 15263,
           "bbox": [
-            59,
-            14,
-            203,
-            162
+            51,
+            10,
+            195,
+            182
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 5
+          "chroma_adjacent_pixels": 3
         },
         {
           "index": 1,
-          "nontransparent_pixels": 12327,
+          "nontransparent_pixels": 14968,
           "bbox": [
-            57,
-            14,
-            206,
-            162
+            51,
+            10,
+            193,
+            182
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 8
+          "chroma_adjacent_pixels": 0
         },
         {
           "index": 2,
-          "nontransparent_pixels": 12292,
+          "nontransparent_pixels": 15208,
           "bbox": [
-            58,
-            14,
-            213,
-            162
+            34,
+            10,
+            195,
+            182
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 14
+          "chroma_adjacent_pixels": 1
         },
         {
           "index": 3,
-          "nontransparent_pixels": 12513,
+          "nontransparent_pixels": 15868,
           "bbox": [
-            58,
-            14,
-            231,
-            162
+            38,
+            10,
+            198,
+            182
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 15
+          "chroma_adjacent_pixels": 3
         }
       ],
       "ok": true

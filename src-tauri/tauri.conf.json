@@ -15,8 +15,8 @@
       {
         "label": "main",
         "title": "aipet",
-        "width": 220,
-        "height": 240,
+        "width": 240,
+        "height": 320,
         "transparent": true,
         "decorations": false,
         "alwaysOnTop": true,

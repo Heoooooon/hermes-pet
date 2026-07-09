@@ -7,7 +7,7 @@
     "width": 192,
     "height": 256,
     "safe_margin_x": 18,
-    "safe_margin_y": 16
+    "safe_margin_y": 8
   },
   "chroma_key": {
     "name": "cyan",
@@ -35,51 +35,51 @@
       "frame_records": [
         {
           "index": 0,
-          "nontransparent_pixels": 12255,
+          "nontransparent_pixels": 17329,
           "bbox": [
-            53,
-            16,
-            144,
-            240
+            41,
+            8,
+            148,
+            248
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 27
+          "chroma_adjacent_pixels": 2
         },
         {
           "index": 1,
-          "nontransparent_pixels": 11178,
+          "nontransparent_pixels": 16112,
           "bbox": [
-            56,
-            16,
-            141,
-            240
+            44,
+            8,
+            146,
+            248
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 45
+          "chroma_adjacent_pixels": 1
         },
         {
           "index": 2,
-          "nontransparent_pixels": 11360,
+          "nontransparent_pixels": 17000,
           "bbox": [
-            55,
-            16,
-            143,
-            240
+            44,
+            8,
+            150,
+            248
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 45
+          "chroma_adjacent_pixels": 0
         },
         {
           "index": 3,
-          "nontransparent_pixels": 11432,
+          "nontransparent_pixels": 16055,
           "bbox": [
-            55,
-            16,
-            143,
-            240
+            44,
+            8,
+            151,
+            248
           ],
           "edge_pixels": 0,
-          "chroma_adjacent_pixels": 58
+          "chroma_adjacent_pixels": 2
         }
       ],
       "ok": true

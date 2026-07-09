@@ -10,8 +10,8 @@ const canvas = document.getElementById("overlay") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;
 
 // Pet window size in logical px — keep in sync with tauri.conf.json.
-const PET_W = 220;
-const PET_H = 240;
+const PET_W = 240;
+const PET_H = 320;
 
 // Logical rect of the monitor this overlay covers. list_windows reports
 // global logical coordinates, so drawing subtracts this origin.

@@ -74,6 +74,7 @@ function packUrl(pack: string, key: State): string {
 
 function loadPack(pack: string) {
   currentPack = pack;
+  document.body.dataset.pack = pack; // pack-specific CSS (per-state sizes)
   loadedSprites.clear();
   for (const key of ALL_STATES) {
     document.body.classList.remove(`has-${key}`);
@@ -877,8 +878,8 @@ friendBtn.addEventListener("click", () => {
   const label = `pet-${Date.now().toString(36)}-${friendsSpawned}`;
   new WebviewWindow(label, {
     url: "index.html",
-    width: 220,
-    height: 240,
+    width: 240,
+    height: 320,
     transparent: true,
     decorations: false,
     alwaysOnTop: true,
@@ -977,7 +978,7 @@ async function applyPetSize() {
   );
   const k = Math.max(1, cfg.size);
   await appWindow.setSize(
-    new LogicalSize(Math.round(220 * k), Math.round(240 * k)),
+    new LogicalSize(Math.round(240 * k), Math.round(320 * k)),
   );
 }
 

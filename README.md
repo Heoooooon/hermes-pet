@@ -11,6 +11,29 @@ app windows, rockets between monitors, and can even hop over to your iPad.
 > 캐릭터는 [Nous Research의 hermes-agent](https://github.com/NousResearch)를 모티프로 한
 > 팬 캐릭터입니다. 이 저장소는 hermes-agent 및 Nous Research와 무관한 팬 프로젝트입니다.
 
+## 미리보기
+
+<p align="center">
+  <img src="docs/media/rocket.gif" width="320" alt="로켓을 타고 솟구쳤다가 낙하산으로 창 위에 착지">
+</p>
+<p align="center"><sub>🚀 로켓 발사 → 엔진 컷 → 낙하산 → <b>창 위에 착지</b> (창의 윗변이 발판입니다)</sub></p>
+
+<p align="center">
+  <img src="docs/media/jet.gif" width="640" alt="제트를 타고 화면을 가로지르는 대시">
+</p>
+<p align="center"><sub>✈️ 옆으로 타는 제트 대시 — 내려서는 낙하산으로 착지</sub></p>
+
+<p align="center">
+  <img src="docs/media/walk-edge.gif" width="520" alt="바닥을 걷다가 화면 코너를 붙잡고 올라앉기">
+</p>
+<p align="center"><sub>🚶 산책하다가 코너를 만나면 붙잡고 올라가 앉습니다</sub></p>
+
+동작 스프라이트 (APNG — 그대로 재생됩니다):
+
+| idle | walk | rocket | jet | fall | edge |
+| :-: | :-: | :-: | :-: | :-: | :-: |
+| <img src="public/idle.apng" width="72"> | <img src="public/walk.apng" width="66"> | <img src="public/rocket.apng" width="72"> | <img src="public/jet.apng" width="96"> | <img src="public/fall.apng" width="72"> | <img src="public/edge.apng" width="72"> |
+
 ## 기능
 
 - 🚶 **창 위를 걷기** — 실제 앱 창의 윗변을 발판으로 인식해서 올라가 걷고, 창이 움직이면 같이 이동

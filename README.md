@@ -28,11 +28,15 @@ app windows, rockets between monitors, and can even hop over to your iPad.
 </p>
 <p align="center"><sub>🚶 산책하다가 코너를 만나면 붙잡고 올라가 앉습니다</sub></p>
 
-동작 스프라이트 (APNG — 그대로 재생됩니다):
+동작 스프라이트 (APNG — 그대로 재생됩니다). 캐릭터는 **팩**으로 갈아끼울 수 있고,
+기본 팩은 **시멍** 🐶, 옵션 팩으로 헤르메스 🎧가 들어 있습니다 (설정 패널에서 전환):
 
-| idle | walk | rocket | jet | fall | edge |
-| :-: | :-: | :-: | :-: | :-: | :-: |
-| <img src="public/idle.apng" width="72"> | <img src="public/walk.apng" width="66"> | <img src="public/rocket.apng" width="72"> | <img src="public/jet.apng" width="96"> | <img src="public/fall.apng" width="72"> | <img src="public/edge.apng" width="72"> |
+| 팩 | idle | walk | rocket | jet | fall | edge |
+| :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| 시멍 | <img src="public/packs/simeong/idle.apng" width="72"> | <img src="public/packs/simeong/walk.apng" width="66"> | <img src="public/packs/simeong/rocket.apng" width="72"> | <img src="public/packs/simeong/jet.apng" width="96"> | <img src="public/packs/simeong/fall.apng" width="72"> | <img src="public/packs/simeong/edge.apng" width="72"> |
+| 헤르메스 | <img src="public/packs/hermes/idle.apng" width="72"> | <img src="public/packs/hermes/walk.apng" width="66"> | <img src="public/packs/hermes/rocket.apng" width="72"> | <img src="public/packs/hermes/jet.apng" width="96"> | <img src="public/packs/hermes/fall.apng" width="72"> | <img src="public/packs/hermes/edge.apng" width="72"> |
+
+(위 데모 GIF들은 헤르메스 팩으로 촬영한 것입니다.)
 
 ## 기능
 
@@ -42,7 +46,8 @@ app windows, rockets between monitors, and can even hop over to your iPad.
 - 🖥️ **멀티 모니터** — 스케일이 다른 모니터(레티나+외장) 사이를 걸어서/제트로/로켓으로 넘나듦.
   좌우 배치는 물론 위아래로 쌓인 배치도 지원 (위로는 로켓, 아래로는 다이빙)
 - 📱 **iPad 핸드오프** — Lanbeam 에이전트(별도 프로젝트)가 실행 중이면 화면 끝에서 iPad로 건너감 (선택 기능, 없어도 완전히 동작)
-- 🎛️ **설정 GUI** — 우클릭 메뉴 → 설정: 크기·속도·활동성·묘기 빈도를 실시간 조절 (iPad 펫에도 동기화)
+- 🎛️ **설정 GUI** — 우클릭 메뉴 → 설정: 캐릭터 팩 전환, 크기·속도·활동성·묘기 빈도 실시간 조절 (iPad 펫에도 동기화)
+- 🎭 **캐릭터 팩** — `public/packs/<이름>/`에 동작 APNG를 넣으면 새 캐릭터가 됩니다
 - 🐾 **친구 소환** — 최대 3마리까지 성격(크기·걸음걸이)이 조금씩 다른 친구들을 추가
 - 🔍 **인식 표시** — 어떤 창을 발판으로 인식하는지 모니터별 오버레이로 시각화
 - ✋ **드래그 / 💖 클릭 반응** — 잡아 옮기면 대롱대롱, 클릭하면 하트
@@ -109,10 +114,11 @@ macOS의 논리 포인트 좌표계에서 계산합니다.
 
 이 프로젝트는 아래 분들의 도움으로 만들어졌습니다. 감사합니다! 🙏
 
-- **캐릭터 제공** — [asin_cartel](https://www.threads.com/@asin_cartel)
-- **동작 GIF 제공** (낙하산·등반 등) — 에르메스 게임단 **Nornen**님
+- **헤르메스 팩 캐릭터 제공** — [asin_cartel](https://www.threads.com/@asin_cartel)
+- **헤르메스 팩 동작 GIF 제공** (낙하산·등반 등) — 에르메스 게임단 **Nornen**님
 - **스프라이트 생성 도구** — [sprite-gen](https://github.com/aldegad/sprite-gen) (@aldegad)
-- 캐릭터 모티프 — [hermes-agent](https://hermes-agent.nousresearch.com) (Nous Research)
+- 헤르메스 캐릭터 모티프 — [hermes-agent](https://hermes-agent.nousresearch.com) (Nous Research)
+- 시멍(기본 팩)은 CMORE의 오리지널 캐릭터입니다
 
 ## 라이선스
 

@@ -48,35 +48,50 @@ let edgeTimer: ReturnType<typeof setTimeout> | null = null;
 let rocketFrame: ReturnType<typeof setInterval> | null = null;
 let jetFrame: ReturnType<typeof setInterval> | null = null;
 
-// Per-state animation assets. A state without a (loaded) asset falls back
-// to the idle sprite; CSS keyframes still apply on top either way.
-const SPRITES: Record<State, string> = {
-  idle: "/idle.apng",
-  walk: "/walk.apng",
-  drag: "/drag.apng",
-  react: "/react.apng",
-  fall: "/fall.apng",
-  edge: "/edge.apng",
-  rocket: "/rocket.apng",
-  jet: "/jet.apng",
-};
+// Character packs: each pack is a directory of per-state APNGs. A state
+// without a (loaded) asset falls back to the pack's idle sprite; CSS
+// keyframes still apply on top either way.
+const ALL_STATES: readonly State[] = [
+  "idle",
+  "walk",
+  "drag",
+  "react",
+  "fall",
+  "edge",
+  "rocket",
+  "jet",
+];
 
 // One-shot APNGs (plays=1) need a cache-buster to replay on re-entry.
 const ONE_SHOT: ReadonlySet<State> = new Set(["fall", "edge"]);
 
 const loadedSprites = new Map<State, string>();
+let currentPack = "";
 
-for (const [key, url] of Object.entries(SPRITES) as [State, string][]) {
-  const probe = new Image();
-  probe.onload = () => {
-    loadedSprites.set(key, url);
-    document.body.classList.add(`has-${key}`);
-  };
-  probe.src = url;
+function packUrl(pack: string, key: State): string {
+  return `/packs/${pack}/${key}.apng`;
+}
+
+function loadPack(pack: string) {
+  currentPack = pack;
+  loadedSprites.clear();
+  for (const key of ALL_STATES) {
+    document.body.classList.remove(`has-${key}`);
+    const url = packUrl(pack, key);
+    const probe = new Image();
+    probe.onload = () => {
+      if (currentPack !== pack) return; // switched again while probing
+      loadedSprites.set(key, url);
+      document.body.classList.add(`has-${key}`);
+      if (state === key) pet.src = url; // refresh the visible sprite
+    };
+    probe.src = url;
+  }
+  pet.src = packUrl(pack, "idle");
 }
 
 function spriteFor(target: State): string {
-  return loadedSprites.get(target) ?? SPRITES.idle;
+  return loadedSprites.get(target) ?? packUrl(currentPack, "idle");
 }
 
 function setState(next: State) {
@@ -968,8 +983,10 @@ async function applyPetSize() {
 
 void listen<PetSettings>(SETTINGS_EVENT, async (e) => {
   const sizeChanged = e.payload.size !== cfg.size;
+  const packChanged = e.payload.pack !== cfg.pack;
   cfg = e.payload;
   void pushSettingsToBridge();
+  if (packChanged) loadPack(cfg.pack);
   if (sizeChanged) {
     await applyPetSize();
     await refreshMonitor();
@@ -994,6 +1011,7 @@ async function pushSettingsToBridge() {
 }
 
 async function init() {
+  loadPack(cfg.pack);
   await applyPetSize();
   await refreshMonitor();
   await refreshPlatforms();

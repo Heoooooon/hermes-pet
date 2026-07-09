@@ -77,6 +77,26 @@
         width: 100%;
         accent-color: #ff8a3d;
       }
+      .seg {
+        display: flex;
+        gap: 6px;
+      }
+      .seg button {
+        flex: 1;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 8px;
+        padding: 6px 0;
+        font-size: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        color: #ccc;
+        cursor: pointer;
+      }
+      .seg button.active {
+        background: #ff8a3d;
+        border-color: #ff8a3d;
+        color: #1b1b20;
+        font-weight: 700;
+      }
       .toggle {
         display: flex;
         align-items: center;
@@ -142,6 +162,13 @@
         <button id="close" title="닫기">✕</button>
       </header>
       <main>
+        <div class="row">
+          <label>캐릭터</label>
+          <div id="packs" class="seg">
+            <button type="button" data-pack="simeong">🐶 시멍</button>
+            <button type="button" data-pack="hermes">🎧 헤르메스</button>
+          </div>
+        </div>
         <div class="row">
           <label>크기 <output id="size-out"></output></label>
           <input id="size" type="range" min="50" max="120" step="5" />

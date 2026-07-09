@@ -1,0 +1,116 @@
+{
+  "ok": true,
+  "engine": "component-row",
+  "run_dir": "/Users/cmore/workspace/aipet/art/sprites/simeong-fall",
+  "cell": {
+    "shape": "rect",
+    "width": 192,
+    "height": 256,
+    "safe_margin_x": 18,
+    "safe_margin_y": 10
+  },
+  "chroma_key": {
+    "name": "cyan",
+    "hex": "#00FFFF",
+    "rgb": [
+      0,
+      255,
+      255
+    ],
+    "selection": "auto",
+    "score": 212.65,
+    "min_subject_distance": 192.58
+  },
+  "rows": [
+    {
+      "state": "fall",
+      "frames": 6,
+      "method": "components",
+      "files": [
+        "frames/fall/frame-0.png",
+        "frames/fall/frame-1.png",
+        "frames/fall/frame-2.png",
+        "frames/fall/frame-3.png",
+        "frames/fall/frame-4.png",
+        "frames/fall/frame-5.png"
+      ],
+      "frame_records": [
+        {
+          "index": 0,
+          "nontransparent_pixels": 20597,
+          "bbox": [
+            33,
+            10,
+            172,
+            246
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 7
+        },
+        {
+          "index": 1,
+          "nontransparent_pixels": 18212,
+          "bbox": [
+            20,
+            23,
+            176,
+            232
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 2
+        },
+        {
+          "index": 2,
+          "nontransparent_pixels": 15931,
+          "bbox": [
+            28,
+            10,
+            153,
+            246
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 7
+        },
+        {
+          "index": 3,
+          "nontransparent_pixels": 15006,
+          "bbox": [
+            51,
+            10,
+            151,
+            246
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 31
+        },
+        {
+          "index": 4,
+          "nontransparent_pixels": 14504,
+          "bbox": [
+            47,
+            10,
+            147,
+            246
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 2
+        },
+        {
+          "index": 5,
+          "nontransparent_pixels": 13395,
+          "bbox": [
+            49,
+            10,
+            144,
+            246
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 2
+        }
+      ],
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "warnings": []
+}

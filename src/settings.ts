@@ -23,6 +23,9 @@ function render() {
     $<HTMLOutputElement>(`${key}-out`).value = `${Math.round(s[key] * 100)}%`;
   }
   for (const key of TOGGLES) $<HTMLInputElement>(key).checked = s[key];
+  for (const btn of $("packs").querySelectorAll("button")) {
+    btn.classList.toggle("active", btn.dataset.pack === s.pack);
+  }
 }
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -46,6 +49,14 @@ for (const key of TOGGLES) {
     queueSave();
   });
 }
+
+$("packs").addEventListener("click", (e) => {
+  const pack = (e.target as HTMLElement).dataset?.pack;
+  if (!pack) return;
+  s = { ...s, pack };
+  render();
+  queueSave();
+});
 
 $("reset").addEventListener("click", () => {
   s = { ...(DEFAULTS as PetSettings) };

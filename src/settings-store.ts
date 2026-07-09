@@ -4,15 +4,17 @@
 import { emit } from "@tauri-apps/api/event";
 
 export type PetSettings = {
+  pack: string; // character pack directory under /packs/
   size: number; // pet scale, 1 = 100%
   speed: number; // walk speed multiplier
-  activity: number; // how often she does something (higher = busier)
+  activity: number; // how often the pet does something (higher = busier)
   stunts: number; // rocket/jet frequency multiplier
   crossMonitors: boolean; // roam across adjacent displays
   ipadHandoff: boolean; // hand off to the iPad via Lanbeam
 };
 
 export const DEFAULTS: PetSettings = {
+  pack: "simeong",
   size: 1,
   speed: 1,
   activity: 1,

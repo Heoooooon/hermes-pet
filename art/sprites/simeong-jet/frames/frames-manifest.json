@@ -1,0 +1,90 @@
+{
+  "ok": true,
+  "engine": "component-row",
+  "run_dir": "/Users/cmore/workspace/aipet/art/sprites/simeong-jet",
+  "cell": {
+    "shape": "rect",
+    "width": 256,
+    "height": 176,
+    "safe_margin_x": 16,
+    "safe_margin_y": 14
+  },
+  "chroma_key": {
+    "name": "cyan",
+    "hex": "#00FFFF",
+    "rgb": [
+      0,
+      255,
+      255
+    ],
+    "selection": "auto",
+    "score": 212.65,
+    "min_subject_distance": 192.58
+  },
+  "rows": [
+    {
+      "state": "jet",
+      "frames": 4,
+      "method": "components",
+      "files": [
+        "frames/jet/frame-0.png",
+        "frames/jet/frame-1.png",
+        "frames/jet/frame-2.png",
+        "frames/jet/frame-3.png"
+      ],
+      "frame_records": [
+        {
+          "index": 0,
+          "nontransparent_pixels": 12025,
+          "bbox": [
+            59,
+            14,
+            203,
+            162
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 5
+        },
+        {
+          "index": 1,
+          "nontransparent_pixels": 12327,
+          "bbox": [
+            57,
+            14,
+            206,
+            162
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 8
+        },
+        {
+          "index": 2,
+          "nontransparent_pixels": 12292,
+          "bbox": [
+            58,
+            14,
+            213,
+            162
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 14
+        },
+        {
+          "index": 3,
+          "nontransparent_pixels": 12513,
+          "bbox": [
+            58,
+            14,
+            231,
+            162
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 15
+        }
+      ],
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "warnings": []
+}

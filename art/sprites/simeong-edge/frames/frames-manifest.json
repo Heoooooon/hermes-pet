@@ -1,0 +1,90 @@
+{
+  "ok": true,
+  "engine": "component-row",
+  "run_dir": "/Users/cmore/workspace/aipet/art/sprites/simeong-edge",
+  "cell": {
+    "shape": "rect",
+    "width": 192,
+    "height": 256,
+    "safe_margin_x": 18,
+    "safe_margin_y": 16
+  },
+  "chroma_key": {
+    "name": "cyan",
+    "hex": "#00FFFF",
+    "rgb": [
+      0,
+      255,
+      255
+    ],
+    "selection": "auto",
+    "score": 212.65,
+    "min_subject_distance": 192.58
+  },
+  "rows": [
+    {
+      "state": "edge",
+      "frames": 4,
+      "method": "components",
+      "files": [
+        "frames/edge/frame-0.png",
+        "frames/edge/frame-1.png",
+        "frames/edge/frame-2.png",
+        "frames/edge/frame-3.png"
+      ],
+      "frame_records": [
+        {
+          "index": 0,
+          "nontransparent_pixels": 14770,
+          "bbox": [
+            41,
+            16,
+            171,
+            240
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 4
+        },
+        {
+          "index": 1,
+          "nontransparent_pixels": 16072,
+          "bbox": [
+            28,
+            16,
+            175,
+            240
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 4
+        },
+        {
+          "index": 2,
+          "nontransparent_pixels": 14491,
+          "bbox": [
+            16,
+            85,
+            172,
+            240
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 25
+        },
+        {
+          "index": 3,
+          "nontransparent_pixels": 17198,
+          "bbox": [
+            16,
+            16,
+            169,
+            240
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 8
+        }
+      ],
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "warnings": []
+}

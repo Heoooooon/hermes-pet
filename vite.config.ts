@@ -16,6 +16,7 @@ export default defineConfig({
       input: {
         main: "index.html",
         debug: "debug.html",
+        settings: "settings.html",
       },
     },
   },

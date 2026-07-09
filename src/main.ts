@@ -4,10 +4,17 @@ import {
   availableMonitors,
   PhysicalPosition,
   LogicalPosition,
+  LogicalSize,
   type Monitor,
 } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/core";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { listen } from "@tauri-apps/api/event";
+import {
+  loadSettings,
+  SETTINGS_EVENT,
+  type PetSettings,
+} from "./settings-store";
 
 const appWindow = getCurrentWindow();
 
@@ -15,6 +22,9 @@ const appWindow = getCurrentWindow();
 // local-only and get a slightly different size and stride for personality.
 const isMainPet = appWindow.label === "main";
 const personality = isMainPet ? 1 : 0.72 + Math.random() * 0.36;
+
+// User-tunable knobs from the settings panel, applied live.
+let cfg: PetSettings = loadSettings();
 const stage = document.getElementById("stage")!;
 const pet = document.getElementById("pet") as HTMLImageElement;
 const effects = document.getElementById("effects")!;
@@ -215,19 +225,23 @@ function stopFall() {
 
 function scheduleNext() {
   if (walkTimer) clearTimeout(walkTimer);
-  walkTimer = setTimeout(() => {
-    if (state !== "idle") return scheduleNext();
-    const roll = Math.random();
-    if (roll < 0.12 && loadedSprites.has("rocket")) {
-      void rocketLaunch();
-    } else if (roll < 0.24 && loadedSprites.has("jet")) {
-      void jetDash();
-    } else if (roll < 0.8) {
-      walk();
-    } else {
-      scheduleNext();
-    }
-  }, 2000 + Math.random() * 3000);
+  walkTimer = setTimeout(
+    () => {
+      if (state !== "idle") return scheduleNext();
+      const roll = Math.random();
+      const stunt = 0.12 * cfg.stunts;
+      if (roll < stunt && loadedSprites.has("rocket")) {
+        void rocketLaunch();
+      } else if (roll < stunt * 2 && loadedSprites.has("jet")) {
+        void jetDash();
+      } else if (roll < 0.8) {
+        walk();
+      } else {
+        scheduleNext();
+      }
+    },
+    (2000 + Math.random() * 3000) / cfg.activity,
+  );
 }
 
 // ---------- jet: hop on a rocket and blast sideways across the screen ----------
@@ -372,7 +386,7 @@ async function walk() {
   let targetX = Math.round(minX + Math.random() * (maxX - minX));
   if (Math.random() < 0.35) targetX = Math.random() < 0.5 ? minX : maxX;
   const dir: -1 | 1 = targetX > pos.x ? 1 : -1;
-  const speed = Math.max(2, Math.round(2 * scale * personality));
+  const speed = Math.max(1, Math.round(2 * scale * personality * cfg.speed));
   const edgeZone = Math.round(16 * scale);
 
   setFlip(dir);
@@ -402,9 +416,11 @@ async function walk() {
 // otherwise climb up and sit on the corner.
 async function arriveAtEnd(dir: -1 | 1) {
   if (standingOn?.id === "floor") {
-    const next = await adjacentMonitor(dir);
-    if (next) return crossTo(next, dir);
-    if (await tryCrossToIPad(dir)) return;
+    if (cfg.crossMonitors) {
+      const next = await adjacentMonitor(dir);
+      if (next) return crossTo(next, dir);
+    }
+    if (cfg.ipadHandoff && (await tryCrossToIPad(dir))) return;
   }
   enterEdge(dir);
 }
@@ -553,7 +569,7 @@ async function crossTo(m: Monitor, dir: -1 | 1) {
   const floorTop = r.y + r.h - lh; // window y when standing on the new floor
   const climbing = floorTop < y - 8;
   const cruiseY = floorTop - 110; // enough headroom to parachute onto the floor
-  const speed = Math.max(1.5, 2 * personality); // logical pt per tick
+  const speed = Math.max(1, 2 * personality * cfg.speed); // logical pt per tick
 
   const arrive = async () => {
     stopCross();
@@ -766,6 +782,33 @@ friendBtn.addEventListener("click", () => {
   });
 });
 
+// ---------- settings panel ----------
+
+const settingsBtn = document.getElementById("settings-open")!;
+
+settingsBtn.addEventListener("click", async () => {
+  menu.hidden = true;
+  const existing = await WebviewWindow.getByLabel("settings");
+  if (existing) {
+    await existing.show();
+    await existing.setFocus();
+    return;
+  }
+  new WebviewWindow("settings", {
+    url: "settings.html",
+    title: "펫 설정",
+    width: 320,
+    height: 420,
+    resizable: false,
+    transparent: true,
+    decorations: false,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    shadow: true,
+    acceptFirstMouse: true,
+  });
+});
+
 // ---------- debug overlay toggle ----------
 
 const debugBtn = document.getElementById("debug-toggle")!;
@@ -819,13 +862,33 @@ if (isMainPet) void setDebugShown(false);
 
 // ---------- startup: sit at the bottom center of the screen ----------
 
+// Scale the pet and, above 100%, the window that carries her. Physics
+// reads winW/winH back from the OS so it follows automatically.
+async function applyPetSize() {
+  (pet.style as CSSStyleDeclaration & { zoom: string }).zoom = String(
+    personality * cfg.size,
+  );
+  const k = Math.max(1, cfg.size);
+  await appWindow.setSize(
+    new LogicalSize(Math.round(220 * k), Math.round(240 * k)),
+  );
+}
+
+void listen<PetSettings>(SETTINGS_EVENT, async (e) => {
+  const sizeChanged = e.payload.size !== cfg.size;
+  cfg = e.payload;
+  if (sizeChanged) {
+    await applyPetSize();
+    await refreshMonitor();
+    if (state === "idle") void settle(); // feet back on the ground
+  }
+});
+
 async function init() {
+  await applyPetSize();
   await refreshMonitor();
   await refreshPlatforms();
   standingOn = floorPlatform();
-  // Friends are a bit smaller and land somewhere random along the floor.
-  (pet.style as CSSStyleDeclaration & { zoom: string }).zoom =
-    String(personality);
   const x = isMainPet
     ? Math.round(monX + (monW - winW) / 2)
     : Math.round(monX + (0.1 + Math.random() * 0.8) * (monW - winW));

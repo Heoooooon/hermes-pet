@@ -515,6 +515,7 @@ async function syncBridgeAtStartup() {
     const raw = await invoke<string>("pet_bridge_state");
     const st = JSON.parse(raw) as PetBridgeState;
     bridgeSequence = st.sequence;
+    void pushSettingsToBridge(); // the agent may hold stale (or no) tuning
     if (st.location === "ios") await goAway();
   } catch {
     // no agent — purely local pet
@@ -968,12 +969,29 @@ async function applyPetSize() {
 void listen<PetSettings>(SETTINGS_EVENT, async (e) => {
   const sizeChanged = e.payload.size !== cfg.size;
   cfg = e.payload;
+  void pushSettingsToBridge();
   if (sizeChanged) {
     await applyPetSize();
     await refreshMonitor();
     if (state === "idle") void settle(); // feet back on the ground
   }
 });
+
+// Mirror the tuning knobs to the Lanbeam agent so the iPad pet obeys the
+// same settings panel. Silently a no-op when no agent is running.
+async function pushSettingsToBridge() {
+  if (!isMainPet) return;
+  try {
+    await invoke("pet_bridge_settings", {
+      size: cfg.size,
+      speed: cfg.speed,
+      activity: cfg.activity,
+      stunts: cfg.stunts,
+    });
+  } catch {
+    // no agent — purely local pet
+  }
+}
 
 async function init() {
   await applyPetSize();

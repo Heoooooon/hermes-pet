@@ -165,13 +165,30 @@ async fn pet_bridge_handoff(to: String, entry_edge: String) -> Result<String, St
     .map_err(|e| e.to_string())?
 }
 
+#[tauri::command]
+async fn pet_bridge_settings(
+    size: f64,
+    speed: f64,
+    activity: f64,
+    stunts: f64,
+) -> Result<String, String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        let body =
+            format!(r#"{{"size":{size},"speed":{speed},"activity":{activity},"stunts":{stunts}}}"#);
+        bridge_request("POST", "/local/pet/settings", Some(&body))
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             list_windows,
             pet_bridge_state,
-            pet_bridge_handoff
+            pet_bridge_handoff,
+            pet_bridge_settings
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

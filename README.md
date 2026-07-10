@@ -62,6 +62,31 @@ npm run tauri dev     # 개발 모드 실행
 npm run tauri build   # 배포용 앱 빌드
 ```
 
+<details>
+<summary><b>Windows에서 빌드하기</b> (실험적)</summary>
+
+1. [Rust 설치](https://rustup.rs) — 설치 중 **MSVC 툴체인**을 선택하세요.
+   Visual Studio가 없다면 rustup이 안내하는
+   [Visual Studio C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)를
+   먼저 설치해야 합니다 ("Desktop development with C++" 워크로드).
+2. [Node.js](https://nodejs.org) 18+ 설치.
+3. WebView2 런타임 — Windows 10/11에는 대부분 기본 포함. 없다면
+   [여기서 설치](https://developer.microsoft.com/microsoft-edge/webview2/).
+4. 이후는 동일합니다:
+
+   ```powershell
+   npm install
+   npm run tauri dev
+   npm run tauri build   # 산출물: src-tauri\target\release\bundle\
+   ```
+
+창 발판 인식은 Win32(`EnumWindows` + DWM)로 구현되어 있고 컴파일까지
+확인했지만 실기기 검증 전입니다. 이상한 창이 발판으로 잡히면
+`src-tauri/src/lib.rs`의 `SHELL_CLASSES` 목록에 클래스명을 추가하고
+이슈로 알려주세요. iPad 핸드오프는 macOS 전용이라 자동 비활성화됩니다.
+
+</details>
+
 - 조작: 드래그로 이동 · 클릭으로 반응 · **우클릭**으로 메뉴(친구+/설정/인식 표시/종료)
 - 창 인식은 퍼블릭 API만 사용합니다 — 별도 권한 불필요.
   (macOS `CGWindowListCopyWindowInfo` / Windows `EnumWindows` + DWM)

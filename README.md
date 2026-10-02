@@ -1,154 +1,163 @@
 # hermes-pet
 
-**Hermes가 모니터 위를 뛰어다닙니다.** 화면 속 창들을 발판 삼아 걷고, 로켓을 타고
-다른 모니터로 날아가고, 낙하산으로 내려오고, iPad까지 건너가는 오픈소스 데스크톱 펫.
+**English** · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-An open-source macOS desktop pet of the Hermes character — she walks on your
-app windows, rockets between monitors, and can even hop over to your iPad.
+**Hermes runs around on your monitors.** An open-source desktop pet that uses
+your app windows as platforms — she walks on them, rockets off to other
+monitors, floats back down on a parachute, and can even hop over to your iPad.
 
-[Tauri 2](https://tauri.app) (투명 · 프레임리스 · 항상 위 창) + 바닐라 TypeScript로 만들었습니다.
+Built with [Tauri 2](https://tauri.app) (a transparent, frameless,
+always-on-top window) and vanilla TypeScript.
 
-> 캐릭터는 [Nous Research의 hermes-agent](https://github.com/NousResearch)를 모티프로 한
-> 팬 캐릭터입니다. 이 저장소는 hermes-agent 및 Nous Research와 무관한 팬 프로젝트입니다.
+> The character is a fan character inspired by
+> [Nous Research's hermes-agent](https://github.com/NousResearch).
+> This is a fan project and is not affiliated with hermes-agent or Nous Research.
 
-## 미리보기
-
-<p align="center">
-  <img src="docs/media/rocket.gif" width="320" alt="로켓을 타고 솟구쳤다가 낙하산으로 창 위에 착지">
-</p>
-<p align="center"><sub>🚀 로켓 발사 → 엔진 컷 → 낙하산 → <b>창 위에 착지</b> (창의 윗변이 발판입니다)</sub></p>
+## Preview
 
 <p align="center">
-  <img src="docs/media/jet.gif" width="640" alt="제트를 타고 화면을 가로지르는 대시">
+  <img src="docs/media/rocket.gif" width="320" alt="Hermes launches on a rocket, then parachutes down onto a window">
 </p>
-<p align="center"><sub>✈️ 옆으로 타는 제트 대시 — 내려서는 낙하산으로 착지</sub></p>
+<p align="center"><sub>🚀 Liftoff → engine cut → parachute → <b>lands on a window</b> (the top edge of every window is a platform)</sub></p>
 
 <p align="center">
-  <img src="docs/media/walk-edge.gif" width="520" alt="바닥을 걷다가 화면 코너를 붙잡고 올라앉기">
+  <img src="docs/media/jet.gif" width="640" alt="Hermes dashes across the screen on a jet">
 </p>
-<p align="center"><sub>🚶 산책하다가 코너를 만나면 붙잡고 올라가 앉습니다</sub></p>
+<p align="center"><sub>✈️ A sideways jet dash — then a parachute landing</sub></p>
 
-동작 스프라이트 (APNG — 그대로 재생됩니다). 캐릭터는 **팩**으로 갈아끼울 수 있고,
-기본 팩은 **시멍** 🐶, 옵션 팩으로 헤르메스 🎧가 들어 있습니다 (설정 패널에서 전환):
+<p align="center">
+  <img src="docs/media/walk-edge.gif" width="520" alt="Hermes walks along the floor, grabs the screen corner, and climbs up to sit on it">
+</p>
+<p align="center"><sub>🚶 Out for a walk — when she reaches a corner, she grabs it, climbs up, and sits</sub></p>
 
-| 팩 | idle | walk | rocket | jet | fall | edge |
+Action sprites (APNG — they play right here). Characters come as swappable
+**packs**: the default pack is **Simeong** 🐶, and **Hermes** 🎧 ships as an
+optional pack (switch in the settings panel):
+
+| Pack | idle | walk | rocket | jet | fall | edge |
 | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| 시멍 | <img src="public/packs/simeong/idle.apng" width="72"> | <img src="public/packs/simeong/walk.apng" width="66"> | <img src="public/packs/simeong/rocket.apng" width="72"> | <img src="public/packs/simeong/jet.apng" width="96"> | <img src="public/packs/simeong/fall.apng" width="72"> | <img src="public/packs/simeong/edge.apng" width="72"> |
-| 헤르메스 | <img src="public/packs/hermes/idle.apng" width="72"> | <img src="public/packs/hermes/walk.apng" width="66"> | <img src="public/packs/hermes/rocket.apng" width="72"> | <img src="public/packs/hermes/jet.apng" width="96"> | <img src="public/packs/hermes/fall.apng" width="72"> | <img src="public/packs/hermes/edge.apng" width="72"> |
+| Simeong | <img src="public/packs/simeong/idle.apng" width="72"> | <img src="public/packs/simeong/walk.apng" width="66"> | <img src="public/packs/simeong/rocket.apng" width="72"> | <img src="public/packs/simeong/jet.apng" width="96"> | <img src="public/packs/simeong/fall.apng" width="72"> | <img src="public/packs/simeong/edge.apng" width="72"> |
+| Hermes | <img src="public/packs/hermes/idle.apng" width="72"> | <img src="public/packs/hermes/walk.apng" width="66"> | <img src="public/packs/hermes/rocket.apng" width="72"> | <img src="public/packs/hermes/jet.apng" width="96"> | <img src="public/packs/hermes/fall.apng" width="72"> | <img src="public/packs/hermes/edge.apng" width="72"> |
 
-(위 데모 GIF들은 헤르메스 팩으로 촬영한 것입니다.)
+(The demo GIFs above were recorded with the Hermes pack.)
 
-## 기능
+## Features
 
-- 🚶 **창 위를 걷기** — 실제 앱 창의 윗변을 발판으로 인식해서 올라가 걷고, 창이 움직이면 같이 이동
-- 🪂 **낙하산** — 발판이 사라지거나 높은 곳에서 내려올 때 낙하산 하강
-- 🚀 **로켓 & 제트** — 수직 로켓 발사, 옆으로 타고 나는 제트 대시
-- 🖥️ **멀티 모니터** — 스케일이 다른 모니터(레티나+외장) 사이를 걸어서/제트로/로켓으로 넘나듦.
-  좌우 배치는 물론 위아래로 쌓인 배치도 지원 (위로는 로켓, 아래로는 다이빙)
-- 📱 **iPad 핸드오프** — Lanbeam 에이전트(별도 프로젝트)가 실행 중이면 화면 끝에서 iPad로 건너감 (선택 기능, 없어도 완전히 동작)
-- 🎛️ **설정 GUI** — 우클릭 메뉴 → 설정: 캐릭터 팩 전환, 크기·속도·활동성·묘기 빈도 실시간 조절 (iPad 펫에도 동기화)
-- 🎭 **캐릭터 팩** — `public/packs/<이름>/`에 동작 APNG를 넣으면 새 캐릭터가 됩니다
-- 🐾 **친구 소환** — 최대 3마리까지 성격(크기·걸음걸이)이 조금씩 다른 친구들을 추가
-- 🔍 **인식 표시** — 어떤 창을 발판으로 인식하는지 모니터별 오버레이로 시각화
-- ✋ **드래그 / 💖 클릭 반응** — 잡아 옮기면 대롱대롱, 클릭하면 하트
+- 🚶 **Walks on windows** — treats the top edge of real app windows as platforms, climbs up and walks along them, and rides along when a window moves
+- 🪂 **Parachute** — floats down when her platform disappears or she drops from somewhere high
+- 🚀 **Rocket & jet** — vertical rocket launches and sideways jet dashes
+- 🖥️ **Multi-monitor** — crosses between monitors with different scale factors (Retina + external) by walking, jetting, or rocketing.
+  Works with side-by-side layouts and vertically stacked ones too (rocket up, dive down)
+- 📱 **iPad handoff** — if the Lanbeam agent (a separate project) is running, she hops over to your iPad at the screen edge (optional; everything works without it)
+- 🎛️ **Settings GUI** — right-click → Settings: switch character packs and tune size, speed, activity, and trick frequency live (synced to the iPad pet too)
+- 🎭 **Character packs** — drop action APNGs into `public/packs/<name>/` to make a new character
+- 🐾 **Summon friends** — add up to 3 friends, each with a slightly different personality (size, gait)
+- 🔍 **Recognition overlay** — a per-monitor overlay shows which windows she sees as platforms
+- ✋ **Drag / 💖 click reactions** — pick her up and she dangles; click her and she sends a heart
 
-## 시작하기
+## Getting started
 
-요구 사항: [Node.js](https://nodejs.org) 18+, [Rust](https://rustup.rs) 툴체인.
+Requirements: [Node.js](https://nodejs.org) 18+ and the [Rust](https://rustup.rs) toolchain.
 
 ```bash
 npm install
-npm run tauri dev     # 개발 모드 실행
-npm run tauri build   # 배포용 앱 빌드
+npm run tauri dev     # run in development mode
+npm run tauri build   # build a release app
 ```
 
 <details>
-<summary><b>Windows에서 빌드하기</b> (실험적)</summary>
+<summary><b>Building on Windows</b> (experimental)</summary>
 
-1. [Rust 설치](https://rustup.rs) — 설치 중 **MSVC 툴체인**을 선택하세요.
-   Visual Studio가 없다면 rustup이 안내하는
-   [Visual Studio C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)를
-   먼저 설치해야 합니다 ("Desktop development with C++" 워크로드).
-2. [Node.js](https://nodejs.org) 18+ 설치.
-3. WebView2 런타임 — Windows 10/11에는 대부분 기본 포함. 없다면
-   [여기서 설치](https://developer.microsoft.com/microsoft-edge/webview2/).
-4. 이후는 동일합니다:
+1. [Install Rust](https://rustup.rs) — choose the **MSVC toolchain** during setup.
+   If you don't have Visual Studio, install the
+   [Visual Studio C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
+   that rustup points you to first (the "Desktop development with C++" workload).
+2. Install [Node.js](https://nodejs.org) 18+.
+3. WebView2 runtime — included with most Windows 10/11 installs. If it's missing,
+   [install it here](https://developer.microsoft.com/microsoft-edge/webview2/).
+4. The rest is the same:
 
    ```powershell
    npm install
    npm run tauri dev
-   npm run tauri build   # 산출물: src-tauri\target\release\bundle\
+   npm run tauri build   # output: src-tauri\target\release\bundle\
    ```
 
-창 발판 인식은 Win32(`EnumWindows` + DWM)로 구현되어 있고 컴파일까지
-확인했지만 실기기 검증 전입니다. 이상한 창이 발판으로 잡히면
-`src-tauri/src/lib.rs`의 `SHELL_CLASSES` 목록에 클래스명을 추가하고
-이슈로 알려주세요. iPad 핸드오프는 macOS 전용이라 자동 비활성화됩니다.
+Window-platform detection is implemented with Win32 (`EnumWindows` + DWM) and
+compiles, but hasn't been tested on real hardware yet. If an odd window gets
+picked up as a platform, add its class name to the `SHELL_CLASSES` list in
+`src-tauri/src/lib.rs` and let us know in an issue. iPad handoff is macOS-only
+and is disabled automatically.
 
 </details>
 
-- 조작: 드래그로 이동 · 클릭으로 반응 · **우클릭**으로 메뉴(친구+/설정/인식 표시/종료)
-- 창 인식은 퍼블릭 API만 사용합니다 — 별도 권한 불필요.
+- Controls: drag to move · click for a reaction · **right-click** for the menu (Friend+ / Settings / Recognition overlay / Quit)
+- Window detection uses public APIs only — no extra permissions needed.
   (macOS `CGWindowListCopyWindowInfo` / Windows `EnumWindows` + DWM)
 
-### 플랫폼 지원
+### Platform support
 
-| 플랫폼 | 상태 |
+| Platform | Status |
 | --- | --- |
-| **macOS** | 개발·검증 완료 (기본 타깃) |
-| **Windows** | 실험적 — 창 발판 인식까지 Win32로 구현·컴파일 확인, 실기기 검증 전. 이슈 환영! |
+| **macOS** | Developed and tested (primary target) |
+| **Windows** | Experimental — window-platform detection implemented in Win32 and compiles, not yet tested on real hardware. Issues welcome! |
 
-iPad 핸드오프는 macOS 전용입니다(Lanbeam 에이전트가 macOS 앱).
+iPad handoff is macOS-only (the Lanbeam agent is a macOS app).
 
-## 나만의 캐릭터 넣기
+## Bring your own character
 
-모든 동작은 `public/<state>.apng` 스프라이트입니다 (idle / walk / drag / react /
-fall / edge / rocket / jet). 같은 이름으로 교체하면 바로 적용되고, 없는 동작은
-idle로 대체됩니다.
+Every action is a sprite at `public/packs/<pack>/<state>.apng` (idle / walk /
+drag / react / fall / edge / rocket / jet). Replace a file with the same name
+and it takes effect immediately; any missing action falls back to idle.
+Optional variants (`<state>.2.apng` … `<state>.4.apng`) are picked at random.
 
-새 동작 추가 파이프라인은 `.claude/skills/add-action/SKILL.md`에 레시피로 정리되어
-있습니다 — [sprite-gen](https://github.com/aldegad/sprite-gen)으로 프레임을 생성하는
-모드와, 마젠타 배경 GIF를 변환하는 모드 두 가지:
+The pipeline for adding a new action is written up as a recipe in
+`.claude/skills/add-action/SKILL.md`, with two modes: generating frames with
+[sprite-gen](https://github.com/aldegad/sprite-gen), or converting a GIF on a
+magenta background:
 
 ```bash
-# 단색 배경 GIF → 알파 APNG (크로마키 + 디스필 + 조립)
+# Solid-background GIF → alpha APNG (chroma key + despill + assemble)
 ffmpeg -i in.gif -vf "colorkey=0xFF00FF:0.12:0.08" key_%02d.png
-ffmpeg -framerate 50/3 -start_number 1 -i key_%02d.png -c:v apng -plays 0 public/idle.apng
+ffmpeg -framerate 50/3 -start_number 1 -i key_%02d.png -c:v apng -plays 0 public/packs/<pack>/idle.apng
 ```
 
-원본 소스는 `art/`에 보존되어 있습니다.
+The original source art is kept in `art/`.
 
-## 구조
+## Project structure
 
 ```
-src/main.ts        행동 두뇌: 상태 머신(idle/walk/drag/react/fall/edge/rocket/jet),
-                   창 발판 물리, 멀티 모니터 크로싱, Lanbeam 핸드오프
-src/style.css      상태별 CSS 모션 (그려진 스프라이트와 충돌하지 않게 상태별로 on/off)
-src/debug.ts       모니터별 발판 인식 오버레이
-src/settings.ts    설정 패널 (localStorage 영속 + 이벤트 브로드캐스트)
-src-tauri/         Tauri 셸: 투명 창, list_windows(CGWindowList), Lanbeam 브리지 클라이언트
-public/*.apng      동작 스프라이트 (교체 가능)
-art/               원본 아트웍 + sprite-gen 생성 기록
+src/main.ts          Behavior brain: state machine (idle/walk/drag/react/fall/edge/rocket/jet),
+                     window-platform physics, multi-monitor crossing, Lanbeam handoff
+src/style.css        Per-state CSS motion (toggled per state so it doesn't fight the drawn sprites)
+src/debug.ts         Per-monitor platform-recognition overlay
+src/settings.ts      Settings panel (persisted to localStorage + broadcast as events)
+src-tauri/           Tauri shell: transparent window, list_windows (CGWindowList), Lanbeam bridge client
+public/packs/*/      Character packs: per-action APNG sprites (swappable)
+art/                 Original artwork + sprite-gen generation records
 ```
 
-펫이 걷는 것은 OS 창 자체를 움직이는 것(`setPosition`)이라, 고정 캔버스가 아니라
-진짜 데스크톱을 돌아다닙니다. 모니터 간 이동은 스케일이 달라도 어긋나지 않도록
-macOS의 논리 포인트 좌표계에서 계산합니다.
+When the pet walks, it moves the actual OS window (`setPosition`), so she
+roams your real desktop rather than a fixed canvas. Crossing between monitors
+is computed in macOS logical-point coordinates, so she stays aligned even when
+the monitors have different scale factors.
 
-## 크레딧
+## Credits
 
-이 프로젝트는 아래 분들의 도움으로 만들어졌습니다. 감사합니다! 🙏
+This project was made with help from the people below. Thank you! 🙏
 
-- **헤르메스 팩 캐릭터 제공** — [asin_cartel](https://www.threads.com/@asin_cartel)
-- **헤르메스 팩 동작 GIF 제공** (낙하산·등반 등) — 에르메스 게임단 **Nornen**님
-- **스프라이트 생성 도구** — [sprite-gen](https://github.com/aldegad/sprite-gen) (@aldegad)
-- 헤르메스 캐릭터 모티프 — [hermes-agent](https://hermes-agent.nousresearch.com) (Nous Research)
-- 시멍(기본 팩)은 CMORE의 오리지널 캐릭터입니다
+- **Hermes pack character** — [asin_cartel](https://www.threads.com/@asin_cartel)
+- **Hermes pack action GIFs** (parachute, climbing, and more) — **Nornen** of the Hermes game crew (에르메스 게임단)
+- **Sprite generation tool** — [sprite-gen](https://github.com/aldegad/sprite-gen) (@aldegad)
+- Hermes character inspiration — [hermes-agent](https://hermes-agent.nousresearch.com) (Nous Research)
+- Simeong (the default pack) is an original character by CMORE
 
-## 라이선스
+## License
 
-- **코드**: [MIT](./LICENSE)
-- **캐릭터·아트 에셋** (`art/`, `public/*.apng`): 저작권은 각 제공자
-  (asin_cartel님, Nornen님)에게 있으며 이 프로젝트에 사용을 허락받은 것입니다.
-  코드 라이선스(MIT)에 포함되지 않으므로, 에셋을 다른 곳에 쓰려면 원작자의
-  허락을 받으세요. 포크해서 쓰실 때는 자신의 캐릭터로 교체하는 것을 권장합니다.
+- **Code**: [MIT](./LICENSE)
+- **Character and art assets** (`art/`, `public/packs/`): copyright belongs to
+  their respective contributors (asin_cartel, Nornen), who have granted this
+  project permission to use them. They are not covered by the code's MIT
+  license, so please get the original artist's permission before using them
+  elsewhere. If you fork this project, we recommend swapping in your own
+  character.
